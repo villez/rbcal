@@ -5,55 +5,101 @@ require 'date'
 
 class CLICal
 
-  def initialize(month, year)
+  def initialize(month, year, flag_full_year)
     @month = month
     @year = year
-    @first_day = Date.new(@year, @month, 1)
+    @flag_full_year = flag_full_year
     init_holidays
     init_notables
   end
 
   def print_cal
-    print_month_header
-    print_weekday_header
-    print_calendar_grid
+    if @flag_full_year
+      print_whole_year
+    else
+      print_single_month
+    end
   end
 
-  def print_month_header
-    puts @first_day.strftime("%B %Y").center(24)
+  def print_whole_year
+    (1..12).each_slice(3) do |month_triplet|
+      @month = month_triplet[0]
+      @first_day = Date.new(@year, @month, 1)
+      left_month = month_header + weekday_header + calendar_grid
+      left_month_array = left_month.split("\n")
+      @month = month_triplet[1]
+      @first_day = Date.new(@year, @month, 1)
+      center_month = month_header + weekday_header + calendar_grid
+      center_month_array = center_month.split("\n")
+      @month = month_triplet[2]
+      @first_day = Date.new(@year, @month, 1)
+      right_month = month_header + weekday_header + calendar_grid
+      right_month_array = right_month.split("\n")
+
+      linecount = [right_month_array.size, center_month_array.size, left_month_array.size].max
+      empty = " " * 25
+      combined_month_str = ""
+      
+      (0...linecount).each do |i|
+        combined_month_str << left_month_array.fetch(i, empty)
+        combined_month_str << "  "
+        combined_month_str << center_month_array.fetch(i, empty)
+        combined_month_str << "  "
+        combined_month_str << right_month_array.fetch(i, empty)
+        combined_month_str << "\n"
+      end
+
+      puts combined_month_str
+      puts
+    end
   end
 
-  def print_weekday_header
-    puts "Wk  Mo Tu We Th Fr Sa Su"
+  def print_single_month
+    @first_day = Date.new(@year, @month, 1)
+    print month_header + weekday_header + calendar_grid
   end
 
-  def print_calendar_grid
+  def month_header
+    @first_day.strftime("%B %Y").center(25) + "\n"
+  end
+
+  def weekday_header
+    "Wk  Mo Tu We Th Fr Sa Su \n"
+  end
+
+  def calendar_grid
     day = @first_day
+    str = ""
     while day.month == @month
-      next_week_first = print_week(day)
+      week_str, next_week_first = week_row(day)
+      str << week_str
       day = next_week_first
     end
-    puts
+    str + "\n"
   end
 
-  def print_week(current)
-    printf "\033[32m%02d\033[0m  ", current.cweek
+  def week_row(current)
+    str = sprintf "\033[32m%02d\033[0m  ", current.cweek
     weekday = current.cwday
     days_before = weekday - 1
     days_after = 7 - weekday
-    print "   " * days_before
-    (0..days_after).each do
+    str << "   " * days_before
+    padding_day_count = 0
+    (0..days_after).each do |i|
       if current.month != @month
+        padding_day_count = 7 - i
         break
       end
-      print_day(current)
+      str << day_str(current)
       current += 1
     end
-    print "\n"
-    current  # the first day of the next week at this point
+
+    str << "   " * padding_day_count
+    str << "\n"
+    [str, current]  # current = the first day of the next week at this point
   end
 
-  def print_day(date)
+  def day_str(date)
     daystr = sprintf "%02d ", date.day
     if date == Time.now.to_date
       daystr = sprintf "\033[34m%02d\033[0m ", date.day
@@ -64,7 +110,7 @@ class CLICal
     if @notables.include? [date.day, date.mon]
       daystr = sprintf "\033[33m%02d\033[0m ", date.day
     end
-    print daystr
+    daystr
   end
 
   def init_holidays
@@ -147,23 +193,20 @@ end
 #
 # runner
 #
-if ARGV.size == 2
-  month = Integer(ARGV[0], 10)  # 2nd param: leading zero doesn't mean octal
-  year = Integer(ARGV[1], 10)
-elsif ARGV.size == 1
+case ARGV.size
+when 1 
+  month = nil
+  year = Integer(ARGV[0], 10)   # 2nd param: leading zero doesn't mean octal
   flag_full_year = true
-  year = Integer(ARGV[0], 10)
+when 2
+  month = Integer(ARGV[0], 10)  
+  year = Integer(ARGV[1], 10)
+  flag_full_year = false
 else
   month = Time.now.to_date.month
   year = Time.now.to_date.year
+  flag_full_year = false
 end
 
-if flag_full_year
-  (1..12).each do |m|
-    cal = CLICal.new(m, year)
-    cal.print_cal
-  end
-else
-  cal = CLICal.new(month, year)
-  cal.print_cal
-end
+cal = CLICal.new(month, year, flag_full_year)
+cal.print_cal
