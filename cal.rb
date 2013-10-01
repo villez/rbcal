@@ -74,25 +74,25 @@ class CLICal
     str + "\n"
   end
 
-  def week_row(current)
-    str = sprintf "\033[32m%02d\033[0m  ", current.cweek
-    weekday = current.cwday
-    days_before = weekday - 1
-    days_after = 7 - weekday
-    str << "   " * days_before
-    padding_day_count = 0
+  def week_row(current_day)
+    str = sprintf "\033[32m%02d\033[0m  ", current_day.cweek
+    current_weekday = current_day.cwday
+    padding_before = current_weekday - 1
+    str << "   " * padding_before
+    days_after = 7 - current_weekday
+    padding_after = 0
     (0..days_after).each do |i|
-      if current.month != @month
-        padding_day_count = 7 - i
+      if current_day.month != @month
+        padding_after = 7 - i
         break
       end
-      str << day_str(current)
-      current += 1
+      str << day_str(current_day)
+      current_day += 1
     end
 
-    str << "   " * padding_day_count
+    str << "   " * padding_after  # add padding to end of last week in month
     str << "\n"
-    [str, current]  # current = the first day of the next week at this point
+    [str, current_day]  # here current = the first day of the next week
   end
 
   def day_str(date)
