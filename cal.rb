@@ -15,40 +15,32 @@ class CLICal
 
   def print_cal
     if @flag_full_year
-      print_whole_year
+      print_whole_year(3)
     else
       print_single_month
     end
   end
 
-  def print_whole_year
-    (1..12).each_slice(3) do |month_triplet|
-      @month = month_triplet[0]
-      @first_day = Date.new(@year, @month, 1)
-      left_month = month_header + weekday_header + calendar_grid
-      left_month_array = left_month.split("\n")
-      @month = month_triplet[1]
-      @first_day = Date.new(@year, @month, 1)
-      center_month = month_header + weekday_header + calendar_grid
-      center_month_array = center_month.split("\n")
-      @month = month_triplet[2]
-      @first_day = Date.new(@year, @month, 1)
-      right_month = month_header + weekday_header + calendar_grid
-      right_month_array = right_month.split("\n")
+  def print_whole_year(cols = 3)
+    (1..12).each_slice(cols) do |month_triplet|
+      month_arrays = []
+      month_triplet.each do |i|
+        @month = i
+        @first_day = Date.new(@year, @month, 1)
+        month_arrays << month_grid_str.split("\n")
+      end
 
-      linecount = [right_month_array.size, center_month_array.size, left_month_array.size].max
+      linecount = month_arrays.map { |ma| ma.size }.max
       empty = " " * 25
       combined_month_str = ""
       
       (0...linecount).each do |i|
-        combined_month_str << left_month_array.fetch(i, empty)
-        combined_month_str << "  "
-        combined_month_str << center_month_array.fetch(i, empty)
-        combined_month_str << "  "
-        combined_month_str << right_month_array.fetch(i, empty)
+        month_arrays.each do |ma|
+          combined_month_str << ma.fetch(i, empty)
+          combined_month_str << "  " unless ma == month_arrays.last
+        end
         combined_month_str << "\n"
       end
-
       puts combined_month_str
       puts
     end
@@ -56,9 +48,13 @@ class CLICal
 
   def print_single_month
     @first_day = Date.new(@year, @month, 1)
-    print month_header + weekday_header + calendar_grid
+    print month_grid_str
   end
 
+  def month_grid_str
+    month_header + weekday_header + calendar_grid
+  end
+  
   def month_header
     @first_day.strftime("%B %Y").center(25) + "\n"
   end
@@ -132,7 +128,7 @@ class CLICal
     @notables << find_fathers_day
   end
 
-  def find_midsummer_friday
+  def find_midsummer_friday # the Friday between 19-25 June
     (19..25).each do |x| 
       if Date.new(@year, 6, x).friday?
         return [x, 6]
@@ -140,7 +136,7 @@ class CLICal
     end
   end
 
-  def find_pyhainpaiva
+  def find_pyhainpaiva # the Saturday between Oct 31 and Nov 6
     if Date.new(@year, 10, 31).saturday?
       return [31, 10]
     else
@@ -152,7 +148,7 @@ class CLICal
     end
   end
 
-  def find_mothers_day
+  def find_mothers_day # second Sunday in May
     (8..14).each do |x|
       if Date.new(@year, 5, x).sunday?
         return [x, 5]
@@ -160,7 +156,7 @@ class CLICal
     end
   end
 
-  def find_fathers_day
+  def find_fathers_day # second Sunday in November
     (8..14).each do |x|
       if Date.new(@year, 11, x).sunday?
         return [x, 11]
@@ -171,13 +167,14 @@ class CLICal
   def calculate_easter
     y = @year
 
-    # just reuse an algorithm; don't care about making this
-    # readable as the algos themselves are obscure by default
+    # black box easter algorithm; don't care about making this
+    # readable as all the algorithms are rather obscure and
+    # not interested in understanding them
     n = y % 19
     c = y / 100
     k = (c - 17) / 25
     i = (c - c/4 -(c-k)/3 + 19 * n + 15) % 30
-    i = i -(i/28) * (1 - (i/28) * (29/(i + 1)) * ((21 - n)/11))
+    i = i - (i/28) * (1 - (i/28) * (29/(i + 1)) * ((21 - n)/11))
     j = (y + y/4 + i + 2 - c + c/4) % 7
     l = i - j
     
