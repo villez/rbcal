@@ -7,13 +7,13 @@ class CLICal
   DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
   def initialize
-    @date = Time.now.to_date
-    #@date = Date.new(2012, 9, 7)
+    #@date = Time.now.to_date
+    @date = Date.new(2012, 2, 12)
     @first_day = Date.new(@date.year, @date.month, 1)
     @days_in_month = get_days_in_month
   end
 
-  def print
+  def print_cal
     print_month_header
     print_weekday_header
     print_calendar_grid
@@ -24,19 +24,38 @@ class CLICal
   end
 
   def print_weekday_header
-    puts "Wk# Mo Tu We Th Fr Sa Su"
+    puts "Wk  Mo Tu We Th Fr Sa Su"
   end
 
   def print_calendar_grid
-    print_week(@first_day)
+    day = @first_day
+    while day.month == @date.month
+      prev = print_week(day)
+      day = prev
+    end
     puts
-    puts "#{@days_in_month} days this month"
   end
 
-  def print_week(first_day)
-    first_week = first_day.cweek
-    printf "%02d  ", first_week
-    monday = @first_day -= (@first_day.jd) % 7
+  def print_week(current)
+    printf "\033[32m%02d\033[0m  ", current.cweek
+    weekday = current.cwday
+    days_before = weekday - 1
+    days_after = 7 - weekday
+    print "   " * days_before
+    (0..days_after).each do
+      if current.month != @date.month
+        break
+      end
+      if current == Time.now.to_date
+        daystr = sprintf "\033[34m%02d\033[0m ", current.day
+      else
+        daystr = sprintf "%02d ", current.day
+      end
+      print daystr
+      current += 1
+    end
+    print "\n"
+    current
   end
 
   def get_days_in_month
@@ -50,4 +69,4 @@ class CLICal
 end
 
 cal = CLICal.new
-cal.print
+cal.print_cal
