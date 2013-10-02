@@ -7,28 +7,24 @@ class CLICal
 
   WEEK_ROW_LEN = 25
   EMPTY_WEEK_ROW = " " * WEEK_ROW_LEN
-  DEFAULT_YEAR_COLUMNS = 3
+  DEFAULT_COLUMNS = 3
   EMPTY_DAY_STR = "   "
 
-  def initialize(month, year, flag_full_year = false)
-    @month = month
+  def initialize(start_month, end_month, year)
+    @start_month = @month = start_month
+    @end_month = end_month
     @year = year
-    @flag_full_year = flag_full_year
     init_holidays
     init_notables
   end
 
   def print_cal
-    if @flag_full_year
-      print_whole_year(DEFAULT_YEAR_COLUMNS)
-    else
-      print_single_month
-    end
+    print_month_range(DEFAULT_COLUMNS)
     puts
   end
 
-  def print_whole_year(cols = DEFAULT_YEAR_COLUMNS)
-    (1..12).each_slice(cols) do |months|
+  def print_month_range(cols = DEFAULT_COLUMNS)
+    (@start_month..@end_month).each_slice(cols) do |months|
       month_str_arrays = get_months_as_str_array(months)
       print_month_str_arrays_side_by_side(month_str_arrays)
     end
@@ -59,11 +55,6 @@ class CLICal
     puts combined_month_str
   end
   
-  def print_single_month
-    @first_day_of_month = Date.new(@year, @month, 1)
-    print month_grid_str
-  end
-
   def month_grid_str
     month_header + weekday_header + week_rows_for_month
   end
@@ -190,36 +181,60 @@ class CLICal
 end
 
 
-def usage
-  STDERR.puts "usage: "
-  STDERR.puts "mcal [[month] year]"
+def show_usage_msg_and_exit
+  STDERR.puts "usage:  mcal [[month | start_month-end_month] year]"
   exit
-end  
+end
+
+def parse_month_param
+  if /(?<start_month>\d\d?)-(?<end_month>\d\d?)/ =~ ARGV[0]
+    [get_int_from_str(start_month), get_int_from_str(end_month)]
+  else
+    int_val = get_int_from_str(ARGV[0])
+    [int_val, int_val]
+  end
+end
+
+def get_int_from_str(str)
+  Integer(str, 10)  # 2nd param: allow leading zeros and still decimal, not octal
+end
+
+def month_params_legal?(start_month, end_month)
+  if !(1..12).include?(start_month) ||
+      !(1..12).include?(end_month) ||
+      start_month > end_month
+    false
+  else
+    true
+  end
+end
 
 #
 # runner
 #
 begin
   case ARGV.size
-  when 0
-    month = Time.now.month
+  when 0 # no params = current month only
+    start_month = end_month = Time.now.month
     year = Time.now.year
-    flag_full_year = false
-  when 1 
-    month = nil
-    year = Integer(ARGV[0], 10)   # 2nd param: leading zero doesn't mean octal
-    flag_full_year = true
-  when 2
-    month = Integer(ARGV[0], 10)  
-    year = Integer(ARGV[1], 10)
-    flag_full_year = false
+  when 1 # single parameter = year
+    start_month = 1
+    end_month = 12
+    year = get_int_from_str(ARGV[0])
+  when 2 # two params = month(s), year
+    start_month, end_month = parse_month_param
+    year = get_int_from_str(ARGV[1])
   else
-    usage
+    show_usage_msg_and_exit
   end
-rescue
-  usage
+
+  unless month_params_legal?(start_month, end_month)
+    show_usage_msg_and_exit
+  end
+  
+# mainly for catching malformed params that fail str->int conversion and throw ex
+rescue 
+  show_usage_msg_and_exit
 end
 
-cal = CLICal.new(month, year, flag_full_year)
-cal.print_cal
-
+CLICal.new(start_month, end_month, year).print_cal
