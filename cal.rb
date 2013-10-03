@@ -115,24 +115,26 @@ class CLICal
 
   def init_holidays
     @holidays = [[1, 1], [6, 1], [1, 5], [6, 12], [24, 12], [25, 12], [26, 12]]
-    @holidays << find_midsummer_friday
+    @holidays << midsummer_eve
     easter = calculate_easter
     good_friday = easter - 2
     easter_monday = easter + 1
-    helatorstai = easter + 39
+    ascension_day = easter + 39
     @holidays << [good_friday.day, good_friday.month]
     @holidays << [easter_monday.day, easter_monday.month]
-    @holidays << [helatorstai.day, helatorstai.month]
-    @holidays << find_pyhainpaiva
+    @holidays << [ascension_day.day, ascension_day.month]
+    @holidays << all_hallows_day
   end
 
   def init_notables
     @notables = [[12, 2], [14, 4], [2, 8], [8, 8], [24, 10], [12, 12]]
-    @notables << find_mothers_day
-    @notables << find_fathers_day
+    @notables << mothers_day
+    @notables << fathers_day
+    @notables << daylight_saving_start
+    @notables << daylight_saving_end
   end
 
-  def find_midsummer_friday # the Friday between 19-25 June
+  def midsummer_eve # the Friday between 19-25 June
     (19..25).each do |x|
       # note: in newer Rubies there are convenience methods like friday?, saturday? etc
       # but those don't seem to be included in 1.8.7 which is OS X default still, so
@@ -143,7 +145,7 @@ class CLICal
     end
   end
 
-  def find_pyhainpaiva # the Saturday between Oct 31 and Nov 6
+  def all_hallows_day # the Saturday between Oct 31 and Nov 6
     if Date.new(@year, 10, 31).saturday?
       return [31, 10]
     else
@@ -151,12 +153,20 @@ class CLICal
     end
   end
 
-  def find_mothers_day # second Sunday in May
+  def mothers_day # second Sunday in May
     (8..14).each { |x| if Date.new(@year, 5, x).sunday? then return [x, 5] end }
   end
 
-  def find_fathers_day # second Sunday in November
+  def fathers_day # second Sunday in November
     (8..14).each { |x| if Date.new(@year, 11, x).sunday? then return [x, 11] end }
+  end
+
+  def daylight_saving_start # last Sunday in March
+    31.downto(25).each { |x| if Date.new(@year, 3, x).sunday? then return [x, 3] end }
+  end
+
+  def daylight_saving_end # last Sunday in October
+    31.downto(25).each { |x| if Date.new(@year, 10, x).sunday? then return [x, 10] end }
   end
 
   def calculate_easter
