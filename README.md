@@ -8,8 +8,12 @@ but does have a few additional features:
  * use ANSI colors to highlight the current date, public holidays,
    and other notable dates
 
-Note! The public holidays etc. are currently only shown based on the
+The public holidays etc. are currently only shown based on the
 rules for the Finnish calendar, and there are most probably some
 at least some differences in other countries.
+
+Note! The install.sh script is very very basic and doesn't do 
+any error checking, don't use blindly.
+
 
 Licensed under the MIT license, see the file LICENSE for details.
