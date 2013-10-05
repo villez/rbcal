@@ -1,10 +1,19 @@
 #!/usr/bin/env ruby
 # -*- coding: utf-8 -*-
+#
+# (c) Ville Siltanen 2013
 
 require 'date'
 
-class CLICal
+class RbCal
+  
+  # predefined dates to highlight - [day, month]
+  # Note! based on the Finnish calendar
+  FIXED_HOLIDAYS = [[1, 1], [6, 1], [1, 5], [6, 12], [24, 12], [25, 12], [26, 12]]
+  PERSONAL_HILIGHT_DAYS = [[12, 2], [14, 4], [2, 8], [8, 8], [24, 10]]
 
+  # formatting constants; not really meant to be customized, but depending
+  # on terminal window size, 2 or 4 columns may be useful as well
   WEEK_ROW_LEN = 25
   EMPTY_WEEK_ROW = " " * WEEK_ROW_LEN
   DEFAULT_COLUMNS = 3
@@ -15,7 +24,107 @@ class CLICal
     @end_month = end_month
     @year = year
     init_holidays
-    init_notables
+    init_personal_hilights
+  end
+
+  def init_holidays
+    @holidays = FIXED_HOLIDAYS
+    easter = calculate_easter
+    @holidays << day_month(easter)
+    @holidays << day_month(easter - 2) # Good Friday
+    @holidays << day_month(easter - 1) # Easter Saturday
+    @holidays << day_month(easter + 1) # Monday after Easter
+    ascension_day = easter + 39
+    @holidays << day_month(ascension_day) # Thursday
+    @holidays << day_month(midsummer_eve)
+    @holidays << day_month(midsummer_eve + 1)
+    @holidays << day_month(all_hallows_day)
+  end
+
+  def init_personal_hilights
+    @personal_hilights = PERSONAL_HILIGHT_DAYS
+    @personal_hilights << day_month(mothers_day)
+    @personal_hilights << day_month(fathers_day)
+    @personal_hilights << day_month(daylight_saving_start)
+    @personal_hilights << day_month(daylight_saving_end)
+  end
+
+  def day_month(date)
+    [date.day, date.month]
+  end
+
+  def midsummer_eve # the Friday between 19-25 June
+    (19..25).each do |x|
+      # note: in newer Rubies there are convenience methods like friday?, saturday? etc
+      # but those don't seem to be included in 1.8.7 which is OS X default still, so
+      # for a bit of compatibility, decided not to use them here although they look nicer
+      d = Date.new(@year, 6, x)
+      return d if d.friday?
+    end
+  end
+
+  def all_hallows_day # the Saturday between Oct 31 and Nov 6
+    d = Date.new(@year, 10, 31)
+    return d if d.saturday?
+    
+    (1..6).each do |x; d|
+      d = Date.new(@year, 11, x)
+      return d if d.saturday?
+    end
+  end
+
+  def mothers_day # second Sunday in May
+    second_sunday_in_month(5)
+  end
+
+  def fathers_day # second Sunday in November
+    second_sunday_in_month(11)
+  end
+
+  def daylight_saving_start # last Sunday in March
+    last_sunday_in_month(3)
+  end
+
+  def daylight_saving_end # last Sunday in October
+    last_sunday_in_month(10)
+  end
+
+  def second_sunday_in_month(month)
+    (8..14).each do |x|
+      d = Date.new(@year, month, x)
+      return d if d.sunday?
+    end
+  end
+
+  def last_sunday_in_month(month)
+    31.downto(25).each do |x|
+      d = Date.new(@year, month, x)
+      return d if d.sunday?
+    end
+  end
+
+  def calculate_easter
+    # http://en.wikipedia.org/wiki/Computus#Anonymous_Gregorian_algorithm
+    # There are lots of alternative Easter calculation algorithms,
+    # but not interested in the details here and just treating this as a black box.
+    
+    y = @year
+    a = y % 19
+    b = y / 100
+    c = y % 100
+    d = b / 4
+    e = b % 4
+    f = (b + 8) / 25
+    g = (b - f + 1) / 3
+    h = (19 * a + b - d - g + 15) % 30
+    i = c / 4
+    k = c % 4
+    l = (32 + 2*e + 2*i - h - k) % 7
+    m = (a + 11*h + 22*l) / 451
+    month = (h + l - 7*m + 114) / 31
+    day = ((h + l - 7*m + 114) % 31) +1
+    
+    Date.new(@year, month, day)
   end
 
   def print_cal
@@ -96,98 +205,23 @@ class CLICal
   end
 
   def week_number_str(current_day)
-    sprintf "\033[32m%02d\033[0m  ", current_day.cweek
+    sprintf "\033[32m%02d\033[0m  ", current_day.cweek       # green
   end
   
   def day_str(date)
     daystr = sprintf "%02d ", date.day
     if date == Time.now.to_date
-      daystr = sprintf "\033[34m%02d\033[0m ", date.day
+      daystr = sprintf "\033[34m%02d\033[0m ", date.day      # blue
     end
     if @holidays.include? [date.day, date.mon]
-      daystr = sprintf "\033[31m%02d\033[0m ", date.day
+      daystr = sprintf "\033[31m%02d\033[0m ", date.day      # red
     end
-    if @notables.include? [date.day, date.mon]
-      daystr = sprintf "\033[33m%02d\033[0m ", date.day
+    if @personal_hilights.include? [date.day, date.mon]
+      daystr = sprintf "\033[33m%02d\033[0m ", date.day      # yellow
     end
     daystr
   end
 
-  def init_holidays
-    @holidays = [[1, 1], [6, 1], [1, 5], [6, 12], [24, 12], [25, 12], [26, 12]]
-    @holidays << midsummer_eve
-    easter = calculate_easter
-    good_friday = easter - 2
-    easter_monday = easter + 1
-    ascension_day = easter + 39
-    @holidays << [good_friday.day, good_friday.month]
-    @holidays << [easter_monday.day, easter_monday.month]
-    @holidays << [ascension_day.day, ascension_day.month]
-    @holidays << all_hallows_day
-  end
-
-  def init_notables
-    @notables = [[12, 2], [14, 4], [2, 8], [8, 8], [24, 10], [12, 12]]
-    @notables << mothers_day
-    @notables << fathers_day
-    @notables << daylight_saving_start
-    @notables << daylight_saving_end
-  end
-
-  def midsummer_eve # the Friday between 19-25 June
-    (19..25).each do |x|
-      # note: in newer Rubies there are convenience methods like friday?, saturday? etc
-      # but those don't seem to be included in 1.8.7 which is OS X default still, so
-      # for a bit of compatibility, decided not to use them here although they look nicer
-      if Date.new(@year, 6, x).friday?
-        return [x, 6]
-      end
-    end
-  end
-
-  def all_hallows_day # the Saturday between Oct 31 and Nov 6
-    if Date.new(@year, 10, 31).saturday?
-      return [31, 10]
-    else
-      (1..6).each { |x| if Date.new(@year, 11, x).saturday? then return [x, 11] end }
-    end
-  end
-
-  def mothers_day # second Sunday in May
-    (8..14).each { |x| if Date.new(@year, 5, x).sunday? then return [x, 5] end }
-  end
-
-  def fathers_day # second Sunday in November
-    (8..14).each { |x| if Date.new(@year, 11, x).sunday? then return [x, 11] end }
-  end
-
-  def daylight_saving_start # last Sunday in March
-    31.downto(25).each { |x| if Date.new(@year, 3, x).sunday? then return [x, 3] end }
-  end
-
-  def daylight_saving_end # last Sunday in October
-    31.downto(25).each { |x| if Date.new(@year, 10, x).sunday? then return [x, 10] end }
-  end
-
-  def calculate_easter
-    y = @year
-
-    # black box easter algorithm; don't care about making this
-    # readable as all the algorithms are rather obscure
-    n = y % 19
-    c = y / 100
-    k = (c - 17) / 25
-    i = (c - c/4 -(c-k)/3 + 19 * n + 15) % 30
-    i = i - (i/28) * (1 - (i/28) * (29/(i + 1)) * ((21 - n)/11))
-    j = (y + y/4 + i + 2 - c + c/4) % 7
-    l = i - j
-    
-    m = 3 + (l + 40) / 44;
-    d = l + 28 - 31 * (m / 4);
-    
-    Date.new(y, m, d)
-
-  end
 end
 
 
@@ -242,9 +276,10 @@ begin
     show_usage_msg_and_exit
   end
   
-# mainly for catching malformed params that fail str->int conversion and throw ex
+# mainly for catching malformed cmd line params that fail
+# the str->int conversion and throw an exception
 rescue 
   show_usage_msg_and_exit
 end
 
-CLICal.new(start_month, end_month, year).print_cal
+RbCal.new(start_month, end_month, year).print_cal
