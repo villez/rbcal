@@ -226,7 +226,7 @@ end
 
 
 def show_usage_msg_and_exit
-  STDERR.puts "usage:  mcal [[month | start_month-end_month] year]"
+  STDERR.puts "usage:  rbcal [[month | start_month-end_month] year]"
   exit
 end
 
