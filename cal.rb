@@ -6,7 +6,7 @@
 require 'date'
 
 class RbCal
-  
+
   # predefined dates to highlight - [day, month]
   # Note! based on the Finnish calendar
   FIXED_HOLIDAYS = [[1, 1], [6, 1], [1, 5], [6, 12], [24, 12], [25, 12], [26, 12]]
@@ -23,30 +23,32 @@ class RbCal
     @start_month = @month = start_month
     @end_month = end_month
     @year = year
-    init_holidays
-    init_personal_hilights
+    @holidays = init_holidays
+    @personal_hilights = init_personal_hilights
   end
 
   def init_holidays
-    @holidays = FIXED_HOLIDAYS
+    holidays = FIXED_HOLIDAYS
     easter = calculate_easter
-    @holidays << day_month(easter)
-    @holidays << day_month(easter - 2) # Good Friday
-    @holidays << day_month(easter - 1) # Easter Saturday
-    @holidays << day_month(easter + 1) # Monday after Easter
     ascension_day = easter + 39
-    @holidays << day_month(ascension_day) # Thursday
-    @holidays << day_month(midsummer_eve)
-    @holidays << day_month(midsummer_eve + 1)
-    @holidays << day_month(all_hallows_day)
+    holidays <<
+      day_month(easter) <<
+      day_month(easter - 2) <<          # Good Friday
+      day_month(easter - 1) <<          # Easter Saturday
+      day_month(easter + 1) <<          # Monday after Easter
+      day_month(ascension_day) <<       # Finnish "Helatorstai"
+      day_month(midsummer_eve) <<
+      day_month(midsummer_eve + 1) <<
+      day_month(all_hallows_day)
   end
 
   def init_personal_hilights
-    @personal_hilights = PERSONAL_HILIGHT_DAYS
-    @personal_hilights << day_month(mothers_day)
-    @personal_hilights << day_month(fathers_day)
-    @personal_hilights << day_month(daylight_saving_start)
-    @personal_hilights << day_month(daylight_saving_end)
+    hilights = PERSONAL_HILIGHT_DAYS
+    hilights <<
+      day_month(mothers_day) <<
+      day_month(fathers_day) <<
+      day_month(daylight_saving_start) <<
+      day_month(daylight_saving_end)
   end
 
   def day_month(date)
@@ -66,7 +68,7 @@ class RbCal
   def all_hallows_day # the Saturday between Oct 31 and Nov 6
     d = Date.new(@year, 10, 31)
     return d if d.saturday?
-    
+
     (1..6).each do |x; d|
       d = Date.new(@year, 11, x)
       return d if d.saturday?
@@ -107,7 +109,7 @@ class RbCal
     # http://en.wikipedia.org/wiki/Computus#Anonymous_Gregorian_algorithm
     # There are lots of alternative Easter calculation algorithms,
     # but not interested in the details here and just treating this as a black box.
-    
+
     y = @year
     a = y % 19
     b = y / 100
@@ -123,7 +125,7 @@ class RbCal
     m = (a + 11*h + 22*l) / 451
     month = (h + l - 7*m + 114) / 31
     day = ((h + l - 7*m + 114) % 31) +1
-    
+
     Date.new(@year, month, day)
   end
 
@@ -153,7 +155,7 @@ class RbCal
     # different months may have different amount of weeks -> rows, need max to print
     linecount = month_str_arrays.map { |ma| ma.size }.max
     combined_month_str = ""
-    
+
     (0...linecount).each do |i|           # into each line
       month_str_arrays.each do |ma|       # get a week string from each month
         combined_month_str << ma.fetch(i, EMPTY_WEEK_ROW)
@@ -163,11 +165,11 @@ class RbCal
     end
     puts combined_month_str
   end
-  
+
   def month_grid_str
     month_header + weekday_header + week_rows_for_month
   end
-  
+
   def month_header
     @first_day_of_month.strftime("%B %Y").center(WEEK_ROW_LEN) + "\n"
   end
@@ -191,7 +193,7 @@ class RbCal
     current_week_str = week_number_str(current_day)
     current_week_str << EMPTY_DAY_STR * (current_day.cwday - 1) # padding if 1st not Monday
     (0..(7 - current_day.cwday)).each do |i|
-      if current_day.month == @month 
+      if current_day.month == @month
         current_week_str << day_str(current_day)
         current_day += 1
       else # ran over to next month, in the middle of the week
@@ -207,7 +209,7 @@ class RbCal
   def week_number_str(current_day)
     sprintf "\033[32m%02d\033[0m  ", current_day.cweek       # green
   end
-  
+
   def day_str(date)
     daystr = sprintf "%02d ", date.day
     if date == Time.now.to_date
@@ -275,10 +277,10 @@ begin
   unless month_params_legal?(start_month, end_month)
     show_usage_msg_and_exit
   end
-  
+
 # mainly for catching malformed cmd line params that fail
 # the str->int conversion and throw an exception
-rescue 
+rescue
   show_usage_msg_and_exit
 end
 
