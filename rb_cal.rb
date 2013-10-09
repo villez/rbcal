@@ -57,9 +57,6 @@ class RbCal
 
   def midsummer_eve # the Friday between 19-25 June
     (19..25).each do |x|
-      # note: in newer Rubies there are convenience methods like friday?, saturday? etc
-      # but those don't seem to be included in 1.8.7 which is OS X default still, so
-      # for a bit of compatibility, decided not to use them here although they look nicer
       d = Date.new(@year, 6, x)
       return d if d.friday?
     end
@@ -246,13 +243,9 @@ def get_int_from_str(str)
 end
 
 def month_params_legal?(start_month, end_month)
-  if !(1..12).include?(start_month) ||
-      !(1..12).include?(end_month) ||
-      start_month > end_month
-    false
-  else
-    true
-  end
+  (1..12).include?(start_month) &%
+  (1..12).include?(end_month) &&
+    start_month > end_month
 end
 
 #
@@ -260,21 +253,21 @@ end
 #
 begin
   case ARGV.size
-  when 0 # no params = current month only
+  when 0                                      # no params = current month only
     start_month = end_month = Time.now.month
     year = Time.now.year
-  when 1 # single parameter = year
+  when 1                                      # single parameter = year
     start_month = 1
     end_month = 12
     year = get_int_from_str(ARGV[0])
-  when 2 # two params = month(s), year
+  when 2                                      # two params = month(s), year
     start_month, end_month = parse_month_param
     year = get_int_from_str(ARGV[1])
   else
     show_usage_msg_and_exit
   end
 
-  unless month_params_legal?(start_month, end_month)
+  if not month_params_legal?(start_month, end_month)
     show_usage_msg_and_exit
   end
 
