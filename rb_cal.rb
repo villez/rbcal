@@ -230,7 +230,7 @@ def show_usage_msg_and_exit
 end
 
 def parse_month_param
-  if /(?<start_month>\d\d?)-(?<end_month>\d\d?)/ =~ ARGV[0]
+  if /\A(?<start_month>\d\d?)-(?<end_month>\d\d?)\Z/ =~ ARGV[0]
     [get_int_from_str(start_month), get_int_from_str(end_month)]
   else
     int_val = get_int_from_str(ARGV[0])
