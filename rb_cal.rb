@@ -8,11 +8,6 @@ require "optparse"
 
 class RbCal
 
-  # predefined dates to highlight - [day, month]
-  # Note! based on the Finnish calendar
-  FIXED_HOLIDAYS = [[1, 1], [6, 1], [1, 5], [6, 12], [24, 12], [25, 12], [26, 12]]
-  PERSONAL_HILIGHT_DAYS = [[12, 2], [14, 4], [2, 8], [8, 8], [24, 10]]
-
   # formatting constants; not really meant to be customized, but depending
   # on terminal window size, 2 or 4 columns may be useful as well
   WEEK_ROW_LEN = 25
@@ -24,8 +19,131 @@ class RbCal
     @start_month = @month = start_month
     @end_month = end_month
     @year = year
+    @special_dates = SpecialDate.new(year)
+  end
+
+
+  def print_cal
+    print_month_range(DEFAULT_COLUMNS)
+    puts
+  end
+
+  def print_month_range(cols = DEFAULT_COLUMNS)
+    (@start_month..@end_month).each_slice(cols) do |months|
+      month_str_arrays = get_months_as_str_array(months)
+      print_month_str_arrays_side_by_side(month_str_arrays)
+      puts
+    end
+  end
+
+  def get_months_as_str_array(months)
+    month_str_arrays = []
+    months.each do |i|
+      @month = i
+      @first_day_of_month = Date.new(@year, @month, 1)
+      month_str_arrays << month_grid_str.split("\n")
+    end
+    month_str_arrays
+  end
+
+  def print_month_str_arrays_side_by_side(month_str_arrays)
+    # different months may have different amount of weeks -> rows, need max to print
+    linecount = month_str_arrays.map { |ma| ma.size }.max
+    combined_month_str = ""
+
+    (0...linecount).each do |i|           # into each line
+      month_str_arrays.each do |ma|       # get a week string from each month
+        combined_month_str << ma.fetch(i, EMPTY_WEEK_ROW)
+        combined_month_str << "  " unless ma == month_str_arrays.last
+      end
+      combined_month_str << "\n"
+    end
+    puts combined_month_str
+  end
+
+  def month_grid_str
+    month_header + weekday_header + week_rows_for_month
+  end
+
+  def month_header
+    @first_day_of_month.strftime("%B %Y").center(WEEK_ROW_LEN) + "\n"
+  end
+
+  def weekday_header
+    "Wk  Mo Tu We Th Fr Sa Su \n"
+  end
+
+  def week_rows_for_month
+    current_day = @first_day_of_month
+    month_weeks_grid_str = ""
+    while current_day.month == @month
+      current_week_str, next_week_first_day = week_row(current_day)
+      month_weeks_grid_str << current_week_str
+      current_day = next_week_first_day
+    end
+    month_weeks_grid_str
+  end
+
+  def week_row(current_day)
+    current_week_str = week_number_str(current_day)
+    current_week_str << EMPTY_DAY_STR * (current_day.cwday - 1) # padding if 1st not Monday
+    (0..(7 - current_day.cwday)).each do |i|
+      if current_day.month == @month
+        current_week_str << day_str(current_day)
+        current_day += 1
+      else # ran over to next month, in the middle of the week
+        current_week_str << EMPTY_DAY_STR * (7 - i)  # add padding to end of last week in month
+        break
+      end
+    end
+
+    current_week_str << "\n"
+    [current_week_str, current_day] # when month still unfinished, current_day = 1st day of next week
+  end
+
+  def week_number_str(current_day)
+    colorize_string("%02d  " % current_day.cweek, :green)
+  end
+
+  def day_str(date)
+    daystr = "%02d " % date.day
+    if date == Time.now.to_date
+      daystr = colorize_string(daystr, :blue)
+    elsif @special_dates.is_holiday?(date.day, date.mon)
+      daystr = colorize_string(daystr, :red)
+    elsif @special_dates.is_personal_hilight?(date.day, date.mon)
+      daystr = colorize_string(daystr, :yellow)
+    end
+    daystr
+  end
+
+  def colorize_string(str, color)
+    # not a complete list of colors, but currently only need these 4
+    # foreground colors; if needed more, would consider using a separate gem
+    fg_colors = { red: 31, green: 32, yellow: 33, blue: 34 }
+    "\033[#{fg_colors[color]}m#{str}\033[0m"
+  end
+end
+
+
+class SpecialDate
+  # predefined dates to highlight - [day, month]
+  # Note! based on the Finnish calendar
+  FIXED_HOLIDAYS = [[1, 1], [6, 1], [1, 5], [6, 12], [24, 12], [25, 12], [26, 12]]
+  PERSONAL_HILIGHT_DAYS = [[12, 2], [14, 4], [2, 8], [8, 8], [24, 10]]
+
+  def initialize(year)
+    @year = year
     @holidays = init_holidays
     @personal_hilights = init_personal_hilights
+  end
+
+  def is_holiday?(day, month)
+    @holidays.include?([day, month])
+  end
+
+  def is_personal_hilight?(day, month)
+    @personal_hilights.include?([day, month])
   end
 
   def init_holidays
@@ -108,125 +226,23 @@ class RbCal
     # There are lots of alternative Easter calculation algorithms,
     # but not interested in the details here and just treating this as a black box.
 
-    y = @year
-    a = y % 19
-    b = y / 100
-    c = y % 100
-    d = b / 4
-    e = b % 4
+    a = @year % 19
+    b, c = @year.divmod(100)
+    d, e = b.divmod(4)
     f = (b + 8) / 25
     g = (b - f + 1) / 3
     h = (19 * a + b - d - g + 15) % 30
-    i = c / 4
-    k = c % 4
+    i, k = c.divmod(4)
     l = (32 + 2*e + 2*i - h - k) % 7
     m = (a + 11*h + 22*l) / 451
     month = (h + l - 7*m + 114) / 31
-    day = ((h + l - 7*m + 114) % 31) +1
+    day = ((h + l - 7*m + 114) % 31) + 1
 
     Date.new(@year, month, day)
   end
-
-  def print_cal
-    print_month_range(DEFAULT_COLUMNS)
-    puts
-  end
-
-  def print_month_range(cols = DEFAULT_COLUMNS)
-    (@start_month..@end_month).each_slice(cols) do |months|
-      month_str_arrays = get_months_as_str_array(months)
-      print_month_str_arrays_side_by_side(month_str_arrays)
-    end
-  end
-
-  def get_months_as_str_array(months)
-    month_str_arrays = []
-    months.each do |i|
-      @month = i
-      @first_day_of_month = Date.new(@year, @month, 1)
-      month_str_arrays << month_grid_str.split("\n")
-    end
-    month_str_arrays
-  end
-
-  def print_month_str_arrays_side_by_side(month_str_arrays)
-    # different months may have different amount of weeks -> rows, need max to print
-    linecount = month_str_arrays.map { |ma| ma.size }.max
-    combined_month_str = ""
-
-    (0...linecount).each do |i|           # into each line
-      month_str_arrays.each do |ma|       # get a week string from each month
-        combined_month_str << ma.fetch(i, EMPTY_WEEK_ROW)
-        combined_month_str << "  " unless ma == month_str_arrays.last
-      end
-      combined_month_str << "\n"
-    end
-    puts combined_month_str
-  end
-
-  def month_grid_str
-    month_header + weekday_header + week_rows_for_month
-  end
-
-  def month_header
-    @first_day_of_month.strftime("%B %Y").center(WEEK_ROW_LEN) + "\n"
-  end
-
-  def weekday_header
-    "Wk  Mo Tu We Th Fr Sa Su \n"
-  end
-
-  def week_rows_for_month
-    current_day = @first_day_of_month
-    month_weeks_grid_str = ""
-    while current_day.month == @month
-      current_week_str, next_week_first_day = week_row(current_day)
-      month_weeks_grid_str << current_week_str
-      current_day = next_week_first_day
-    end
-    month_weeks_grid_str
-  end
-
-  def week_row(current_day)
-    current_week_str = week_number_str(current_day)
-    current_week_str << EMPTY_DAY_STR * (current_day.cwday - 1) # padding if 1st not Monday
-    (0..(7 - current_day.cwday)).each do |i|
-      if current_day.month == @month
-        current_week_str << day_str(current_day)
-        current_day += 1
-      else # ran over to next month, in the middle of the week
-        current_week_str << EMPTY_DAY_STR * (7 - i)  # add padding to end of last week in month
-        break
-      end
-    end
-
-    current_week_str << "\n"
-    [current_week_str, current_day] # when month still unfinished, current_day = 1st day of next week
-  end
-
-  def week_number_str(current_day)
-    colorize_string("%02d " % current_day.cweek, :green)
-  end
-
-  def day_str(date)
-    daystr = "%02d " % date.day
-    if date == Time.now.to_date
-      daystr = colorize_string(daystr, :blue)
-    elsif @holidays.include? [date.day, date.mon]
-      daystr = colorize_string(daystr, :red)
-    elsif @personal_hilights.include? [date.day, date.mon]
-      daystr = colorize_string(daystr, :yellow)
-    end
-    daystr
-  end
-
-  def colorize_string(str, color)
-    # not a complete list of colors, but currently only need these 4
-    # foreground colors; if needed more, would consider using a separate gem
-    fg_colors = { red: 31, green: 32, yellow: 33, blue: 34 }
-    "\033[#{fg_colors[color]}m#{str}\033[0m"
-  end
 end
+
+
 
 USAGE_MSG = "Usage: rbcal -h | [[month | start_month-end_month] year]"
 
