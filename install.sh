@@ -6,5 +6,5 @@
 
 echo "installing to ~/bin"
 
-cp ./rb_cal.rb ~/bin/rbcal
+cp ./rbcal.rb ~/bin/rbcal
 chmod a+x ~/bin/rbcal
