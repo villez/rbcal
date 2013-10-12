@@ -32,7 +32,7 @@ class RbCal
     (@start_month..@end_month).each_slice(cols) do |months|
       month_str_arrays = get_months_as_str_array(months)
       print_month_str_arrays_side_by_side(month_str_arrays)
-      puts
+      puts if months.last != @end_month  # extra newline only in between, not after last month row
     end
   end
 
