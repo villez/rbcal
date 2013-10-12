@@ -204,29 +204,32 @@ class RbCal
   end
 
   def week_number_str(current_day)
-    sprintf "\033[32m%02d\033[0m  ", current_day.cweek       # green
+    colorize_string("%02d " % current_day.cweek, :green)
   end
 
   def day_str(date)
-    daystr = sprintf "%02d ", date.day
+    daystr = "%02d " % date.day
     if date == Time.now.to_date
-      daystr = sprintf "\033[34m%02d\033[0m ", date.day      # blue
-    end
-    if @holidays.include? [date.day, date.mon]
-      daystr = sprintf "\033[31m%02d\033[0m ", date.day      # red
-    end
-    if @personal_hilights.include? [date.day, date.mon]
-      daystr = sprintf "\033[33m%02d\033[0m ", date.day      # yellow
+      daystr = colorize_string(daystr, :blue)
+    elsif @holidays.include? [date.day, date.mon]
+      daystr = colorize_string(daystr, :red)
+    elsif @personal_hilights.include? [date.day, date.mon]
+      daystr = colorize_string(daystr, :yellow)
     end
     daystr
   end
 
+  def colorize_string(str, color)
+    # not a complete list of colors, but currently only need these 4
+    # foreground colors; if needed more, would consider using a separate gem
+    fg_colors = { red: 31, green: 32, yellow: 33, blue: 34 }
+    "\033[#{fg_colors[color]}m#{str}\033[0m"
+  end
 end
 
 
 def show_usage_msg_and_exit
-  STDERR.puts "usage:  rbcal [[month | start_month-end_month] year]"
-  exit
+  abort "usage:  rbcal [[month | start_month-end_month] year]"
 end
 
 def parse_month_param
@@ -248,10 +251,7 @@ def month_params_legal?(start_month, end_month)
     start_month <= end_month
 end
 
-#
-# runner
-#
-begin
+def main
   case ARGV.size
   when 0                                      # no params = current month only
     start_month = end_month = Time.now.month
@@ -271,10 +271,12 @@ begin
     show_usage_msg_and_exit
   end
 
+  RbCal.new(start_month, end_month, year).print_cal
+
 # mainly for catching malformed cmd line params that fail
 # the str->int conversion and throw an exception
 rescue
   show_usage_msg_and_exit
 end
 
-RbCal.new(start_month, end_month, year).print_cal
+main
