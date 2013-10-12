@@ -3,7 +3,8 @@
 #
 # (c) Ville Siltanen 2013
 
-require 'date'
+require "date"
+require "optparse"
 
 class RbCal
 
@@ -227,9 +228,10 @@ class RbCal
   end
 end
 
+USAGE_MSG = "Usage: rbcal -h | [[month | start_month-end_month] year]"
 
 def show_usage_msg_and_exit
-  abort "usage:  rbcal [[month | start_month-end_month] year]"
+  abort USAGE_MSG
 end
 
 def parse_month_param
@@ -252,6 +254,14 @@ def month_params_legal?(start_month, end_month)
 end
 
 def main
+  OptionParser.new do |opts|
+    opts.banner = USAGE_MSG
+    opts.on("-h", "--help", "Show this message") do
+      puts opts
+      exit
+    end
+  end.parse!
+
   case ARGV.size
   when 0                                      # no params = current month only
     start_month = end_month = Time.now.month
@@ -278,5 +288,6 @@ def main
 rescue
   show_usage_msg_and_exit
 end
+
 
 main
