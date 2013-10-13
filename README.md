@@ -15,6 +15,6 @@ for the Finnish calendar, and there are going to be some differences
 in other countries.
 
 Note! The install.sh script is very basic, it just copies the main
-script into ~/bin/rb_cal and doesn't do any error checking, so use carefully.
+script into ~/bin/rbcal and doesn't do any error checking, so use carefully.
 
-Licensed under the MIT license, see the LICENSE file.
+(c) Ville Siltanen 2013; Licensed under the MIT license, see LICENSE.

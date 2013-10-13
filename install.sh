@@ -4,7 +4,7 @@
 
 # no error handling implemented or customization options implemented yet
 
-echo "installing to ~/bin"
+echo "installing as ~/bin/rbcal"
 
 cp ./rbcal.rb ~/bin/rbcal
 chmod a+x ~/bin/rbcal
