@@ -119,7 +119,6 @@ class RbCal
 
   def colorize_string(str, color)
     # not a complete list of colors, but currently only need these 4
-    # foreground colors; if needed more, would consider using a separate gem
     fg_colors = { red: 31, green: 32, yellow: 33, blue: 34 }
     "\033[#{fg_colors[color]}m#{str}\033[0m"
   end
@@ -127,10 +126,10 @@ end
 
 
 class SpecialDate
-  # predefined dates to highlight - [day, month]
+  # predefined fixed holiday dates to highlight - [day, month]
   # Note! based on the Finnish calendar
   FIXED_HOLIDAYS = [[1, 1], [6, 1], [1, 5], [6, 12], [24, 12], [25, 12], [26, 12]]
-  PERSONAL_HILIGHT_DAYS = [[12, 2], [14, 4], [2, 8], [8, 8], [24, 10]]
+  CONFIG_FILE = File.join(ENV["HOME"], ".rbcal")
 
   def initialize(year)
     @year = year
@@ -162,9 +161,26 @@ class SpecialDate
   end
 
   def init_personal_hilights
-    hilights = PERSONAL_HILIGHT_DAYS
-    hilights <<
-      day_month(mothers_day) <<
+    hilights = read_hilight_days_from_config_file
+    hilights += standard_hilight_days
+    hilights
+  end
+
+  def read_hilight_days_from_config_file
+    hilights = []
+    return hilights unless File.exist? CONFIG_FILE
+    File.open(CONFIG_FILE, 'r') do |f|
+      f.each_line do |line|
+        next if line.start_with?("#") || line =~ /^\s*\n$/
+        day_str, month_str, year_str = line.split(' ')
+        hilights << [day_str.to_i, month_str.to_i] if !year_str || year_str.to_i == @year
+      end
+    end
+    hilights
+  end
+
+  def standard_hilight_days
+    [] << day_month(mothers_day) <<
       day_month(fathers_day) <<
       day_month(daylight_saving_start) <<
       day_month(daylight_saving_end)
@@ -259,8 +275,12 @@ def parse_month_param
   end
 end
 
+
+# using this instead of #to_i because it silently converts
+# nonnumeric strings into 0, but want to catch those as errors instead
+# 2nd param: allow leading zeros and still decimal, not octal
 def get_int_from_str(str)
-  Integer(str, 10)  # 2nd param: allow leading zeros and still decimal, not octal
+  Integer(str, 10)
 end
 
 def month_params_legal?(start_month, end_month)
@@ -299,9 +319,9 @@ def main
 
   RbCal.new(start_month, end_month, year).print_cal
 
-# mainly for catching malformed cmd line params that fail
-# the str->int conversion and throw an exception
-rescue
+# this is catching malformed cmd line params that fail
+# the string -> integer conversion and throw an exception
+rescue ArgumentError
   show_usage_msg_and_exit
 end
 

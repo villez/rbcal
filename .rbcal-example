@@ -1,0 +1,26 @@
+# rbcal configuration for dates to highlight
+#
+# lines starting with # are treated as comments, and
+# blank lines are ignored;
+#
+# other lines are interpreted as follows:
+# 
+# day month [year]
+#
+# if no year given, assumed to apply to all years
+
+# a couple of commented-out examples below
+
+# highlight these dates for every year:
+# May 4th:
+# 04 05 
+# June 6th:
+# 06 06
+# December 15th:
+# 15 12
+
+# dates on a specific year:
+# November 11th 2013:
+# 11 11 2013
+# October 1st 2014:
+# 01 10 2014
