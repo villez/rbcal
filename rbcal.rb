@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # -*- coding: utf-8 -*-
 #
-# (c) Ville Siltanen 2013
+# (c) Ville Siltanen 2013-2014
 
 require "date"
 require "optparse"
@@ -266,11 +266,11 @@ def show_usage_msg_and_exit
   abort USAGE_MSG
 end
 
-def parse_month_param
-  if /\A(?<start_month>\d\d?)-(?<end_month>\d\d?)\Z/ =~ ARGV[0]
+def parse_month_param(param)
+  if /\A(?<start_month>\d\d?)-(?<end_month>\d\d?)\Z/ =~ param
     [get_int_from_str(start_month), get_int_from_str(end_month)]
   else
-    int_val = get_int_from_str(ARGV[0])
+    int_val = get_int_from_str(param)
     [int_val, int_val]
   end
 end
@@ -302,12 +302,18 @@ def main
   when 0                                      # no params = current month only
     start_month = end_month = Time.now.month
     year = Time.now.year
-  when 1                                      # single parameter = year
-    start_month = 1
-    end_month = 12
-    year = get_int_from_str(ARGV[0])
+  when 1
+    # month range for current year: dd-dd
+    if ARGV[0] =~ /\d{1,2}-\d{1,2}/
+      start_month, end_month = parse_month_param(ARGV[0])
+      year = Time.now.year
+    else # year
+      start_month = 1
+      end_month = 12
+      year = get_int_from_str(ARGV[0])
+    end
   when 2                                      # two params = month(s), year
-    start_month, end_month = parse_month_param
+    start_month, end_month = parse_month_param(ARGV[0])
     year = get_int_from_str(ARGV[1])
   else
     show_usage_msg_and_exit
