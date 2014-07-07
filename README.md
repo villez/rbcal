@@ -25,12 +25,13 @@ in other countries.
     rbcal               # display current month
 	rbcal 05 2014       # display May 2014
 	rbcal 10-12 2013    # display Oct-Dec 2013
+	rbcal 7-10          # display July-October for current year
     rbcal 2015          # display show full year 2015
 
 ## Installing
 
 Note: requires Ruby 1.9+ - exact version cutoff not determined, as I'm
-primarily using 2.0 myself. The reason is mainly because it uses the
+primarily using 2.x myself. The reason is mainly because it uses the
 `Date` stdlib class heavily, and some of the features aren't available
 in 1.8.7. It should be feasible to implement all the same
 functionality in an 1.8 compatible way, but currently I have no
@@ -56,4 +57,4 @@ could include:
 
 ## Copyright & License
 
-(c) Ville Siltanen 2013; MIT license.
+(c) Ville Siltanen 2013-2014; MIT license.
