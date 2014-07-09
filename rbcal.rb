@@ -262,25 +262,24 @@ end
 class Runner
   USAGE_MSG = "Usage: rbcal -h | [[month | start_month-end_month] year]"
 
-  def show_usage_msg_and_exit
-    abort USAGE_MSG
-  end
-
   def parse_month_param(param)
-    if /\A(?<start_month>\d\d?)-(?<end_month>\d\d?)\Z/ =~ param
-      [get_int_from_str(start_month), get_int_from_str(end_month)]
+    if /\A(?<start_month_param>\d\d?)-(?<end_month_param>\d\d?)\Z/ =~ param
+      start_month = int_from_str(start_month_param)
+      end_month = int_from_str(end_month_param)
     else
-      int_val = get_int_from_str(param)
-      [int_val, int_val]
+      start_month = end_month = int_from_str(param)
     end
+    unless month_params_legal?(start_month, end_month)
+      abort USAGE_MSG 
+    end
+    [start_month, end_month]
   end
 
 
-  # using this instead of #to_i because it silently converts
-  # nonnumeric strings into 0, but want to catch those as errors instead
-  # 2nd param: allow leading zeros and still decimal, not octal
-  def get_int_from_str(str)
-    Integer(str, 10)
+  def int_from_str(str)
+    Integer(str, 10)    # always use decimal, even for zero-prefix forms like 05
+  rescue ArgumentError  # if str is not numeric => invalid argument, unrecoverable error
+    abort USAGE_MSG
   end
 
   def month_params_legal?(start_month, end_month)
@@ -292,43 +291,34 @@ class Runner
   def main
     OptionParser.new do |opts|
       opts.banner = USAGE_MSG
-      opts.on("-h", "--help", "Show this message") do
-        puts opts
-        exit
-      end
+      opts.on("-h", "--help", "Show this message") { puts opts; exit }
     end.parse!
 
     case ARGV.size
-    when 0                                      # no params = current month only
+    when 0                                      
+      # no params = current month only
       start_month = end_month = Time.now.month
       year = Time.now.year
     when 1
-      # month range for current year: dd-dd
+      # month range for current year: dd-dd, or a year
       if ARGV[0] =~ /\d{1,2}-\d{1,2}/
         start_month, end_month = parse_month_param(ARGV[0])
         year = Time.now.year
       else # year
         start_month = 1
         end_month = 12
-        year = get_int_from_str(ARGV[0])
+        year = int_from_str(ARGV[0])
       end
-    when 2                                      # two params = month(s), year
+    when 2
+      # two params = month(s), year
       start_month, end_month = parse_month_param(ARGV[0])
-      year = get_int_from_str(ARGV[1])
+      year = int_from_str(ARGV[1])
     else
-      show_usage_msg_and_exit
+      # too many parameters
+      abort USAGE_MSG
     end
-    
-    if not month_params_legal?(start_month, end_month)
-      show_usage_msg_and_exit
-    end
-    
+        
     RbCal.new(start_month, end_month, year).print_cal
-    
-    # this is catching malformed cmd line params that fail
-    # the string -> integer conversion and throw an exception
-  rescue ArgumentError
-    show_usage_msg_and_exit
   end
 end
 
