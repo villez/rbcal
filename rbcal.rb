@@ -147,13 +147,13 @@ class SpecialDate
 
   def init_holidays
     holidays = FIXED_HOLIDAYS
-    easter = calculate_easter
-    ascension_day = easter + 39
+    easter_val = easter  # calculate only once
+    ascension_day = easter_val + 39
     holidays <<
-      day_month(easter) <<
-      day_month(easter - 2) <<          # Good Friday
-      day_month(easter - 1) <<          # Easter Saturday
-      day_month(easter + 1) <<          # Monday after Easter
+      day_month(easter_val) <<
+      day_month(easter_val - 2) <<          # Good Friday
+      day_month(easter_val - 1) <<          # Easter Saturday
+      day_month(easter_val + 1) <<          # Monday after Easter
       day_month(ascension_day) <<       # Finnish "Helatorstai"
       day_month(midsummer_eve) <<
       day_month(midsummer_eve + 1) <<
@@ -237,7 +237,7 @@ class SpecialDate
     end
   end
 
-  def calculate_easter
+  def easter
     # http://en.wikipedia.org/wiki/Computus#Anonymous_Gregorian_algorithm
     # There are lots of alternative Easter calculation algorithms,
     # but not interested in the details here and just treating this as a black box.
