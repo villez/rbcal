@@ -109,9 +109,9 @@ class RbCal
     daystr = "%02d " % date.day
     if date == Time.now.to_date
       daystr = colorize_string(daystr, :blue)
-    elsif @special_dates.is_holiday?(date.day, date.mon)
+    elsif @special_dates.holiday?(date.day, date.mon)
       daystr = colorize_string(daystr, :red)
-    elsif @special_dates.is_personal_hilight?(date.day, date.mon)
+    elsif @special_dates.personal_hilight?(date.day, date.mon)
       daystr = colorize_string(daystr, :yellow)
     end
     daystr
@@ -137,11 +137,11 @@ class SpecialDate
     @personal_hilights = init_personal_hilights
   end
 
-  def is_holiday?(day, month)
+  def holiday?(day, month)
     @holidays.include?([day, month])
   end
 
-  def is_personal_hilight?(day, month)
+  def personal_hilight?(day, month)
     @personal_hilights.include?([day, month])
   end
 
