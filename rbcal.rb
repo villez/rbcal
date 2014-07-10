@@ -201,7 +201,7 @@ class SpecialDate
     d = Date.new(@year, 10, 31)
     return d if d.saturday?
 
-    (1..6).each do |x; d|
+    (1..6).each do |x|
       d = Date.new(@year, 11, x)
       return d if d.saturday?
     end
