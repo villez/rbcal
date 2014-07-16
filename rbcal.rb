@@ -4,7 +4,6 @@
 # (c) Ville Siltanen 2013-2014
 
 require "date"
-require "optparse"
 
 class RbCal
 
@@ -260,7 +259,7 @@ end
 
 
 class Runner
-  USAGE_MSG = "Usage: rbcal -h | [[month | start_month-end_month] year]"
+  USAGE_MSG = "Usage: rbcal [[month | start_month-end_month] year]"
 
   def parse_month_param(param)
     if /\A(?<start_month_param>\d\d?)-(?<end_month_param>\d\d?)\Z/ =~ param
@@ -289,10 +288,14 @@ class Runner
   end
 
   def main
-    OptionParser.new do |opts|
-      opts.banner = USAGE_MSG
-      opts.on("-h", "--help", "Show this message") { puts opts; exit }
-    end.parse!
+    # this is actually redundant, as any non-numeric params
+    # will fail the later checks for valid month/date parameters,
+    # and the usage message will be printed; still, maybe cleaner to
+    # have this explicit 
+    if ARGV[0] == "-h" || ARGV[0] == "--help"
+      puts USAGE_MSG
+      exit
+    end
 
     case ARGV.size
     when 0                                      
