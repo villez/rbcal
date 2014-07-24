@@ -29,13 +29,12 @@ class RbCal
 
   def print_month_range(cols = DEFAULT_COLUMNS)
     (@start_month..@end_month).each_slice(cols) do |months|
-      month_str_arrays = get_months_as_str_array(months)
-      print_month_str_arrays_side_by_side(month_str_arrays)
+      print_months_side_by_side(months_as_str_arrays(months))
       puts if months.last != @end_month  # extra newline only in between, not after last month row
     end
   end
 
-  def get_months_as_str_array(months)
+  def months_as_str_arrays(months)
     month_str_arrays = []
     months.each do |i|
       @month = i
@@ -45,8 +44,9 @@ class RbCal
     month_str_arrays
   end
 
-  def print_month_str_arrays_side_by_side(month_str_arrays)
-    # different months may have different amount of weeks -> rows, need max to print
+  def print_months_side_by_side(month_str_arrays)
+    # different months may have different amount of weeks ->
+    # different amount of rows; need to find max for correct printing
     linecount = month_str_arrays.map { |ma| ma.size }.max
     combined_month_str = ""
 
