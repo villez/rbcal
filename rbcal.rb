@@ -18,7 +18,7 @@ class RbCal
     @start_month = @month = start_month
     @end_month = end_month
     @year = year
-    @special_dates = SpecialDate.new(year)
+    @special_dates = SpecialDates.new(year)
   end
 
 
@@ -124,7 +124,7 @@ class RbCal
 end
 
 
-class SpecialDate
+class SpecialDates
   # predefined fixed holiday dates to highlight - [day, month]
   # Note! based on the Finnish calendar
   FIXED_HOLIDAYS = [[1, 1], [6, 1], [1, 5], [6, 12], [24, 12], [25, 12], [26, 12]]
