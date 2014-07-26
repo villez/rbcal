@@ -261,16 +261,19 @@ end
 class Runner
   USAGE_MSG = "Usage: rbcal [[month | start_month-end_month] year]"
 
+  RE_MONTH_RANGE_PARAM = /\d{1,2}-\d{1,2}/
+  RE_MONTH_RANGE = /\A(?<start_month_param>\d\d?)-(?<end_month_param>\d\d?)\Z/
+
   def parse_month_param(param)
-    if /\A(?<start_month_param>\d\d?)-(?<end_month_param>\d\d?)\Z/ =~ param
-      start_month = int_from_str(start_month_param)
-      end_month = int_from_str(end_month_param)
+    if RE_MONTH_RANGE =~ param
+      start_month = int_from_str(Regexp.last_match(:start_month_param))
+      end_month = int_from_str(Regexp.last_match(:end_month_param))
     else
       start_month = end_month = int_from_str(param)
     end
-    unless month_params_legal?(start_month, end_month)
-      abort USAGE_MSG 
-    end
+    
+    abort USAGE_MSG unless legal_month_params?(start_month, end_month)
+
     [start_month, end_month]
   end
 
@@ -281,21 +284,18 @@ class Runner
     abort USAGE_MSG
   end
 
-  def month_params_legal?(start_month, end_month)
+  def legal_month_params?(start_month, end_month)
     (1..12).include?(start_month) &&
       (1..12).include?(end_month) &&
       start_month <= end_month
   end
 
-  def main
+  def parse_command_line_parameters
     # this is actually redundant, as any non-numeric params
     # will fail the later checks for valid month/date parameters,
     # and the usage message will be printed; still, maybe cleaner to
     # have this explicit 
-    if ARGV[0] == "-h" || ARGV[0] == "--help"
-      puts USAGE_MSG
-      exit
-    end
+    abort USAGE_MSG if ARGV[0] == "-h" || ARGV[0] == "--help"
 
     case ARGV.size
     when 0                                      
@@ -304,7 +304,7 @@ class Runner
       year = Time.now.year
     when 1
       # month range for current year: dd-dd, or a year
-      if ARGV[0] =~ /\d{1,2}-\d{1,2}/
+      if ARGV[0] =~ RE_MONTH_RANGE_PARAM
         start_month, end_month = parse_month_param(ARGV[0])
         year = Time.now.year
       else # year
@@ -320,8 +320,12 @@ class Runner
       # too many parameters
       abort USAGE_MSG
     end
-        
-    RbCal.new(start_month, end_month, year).print_cal
+
+    [start_month, end_month, year]
+  end
+
+  def main
+    RbCal.new(*parse_command_line_parameters).print_cal
   end
 end
 
