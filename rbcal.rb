@@ -261,18 +261,17 @@ end
 class Runner
   USAGE_MSG = "Usage: rbcal [[month | start_month-end_month] year]"
 
-  RE_MONTH_RANGE_PARAM = /\d{1,2}-\d{1,2}/
-  RE_MONTH_RANGE = /\A(?<start_month_param>\d\d?)-(?<end_month_param>\d\d?)\Z/
+  RE_MONTH_RANGE_PARAM = /\A(?<start_month_param>\d\d?)-(?<end_month_param>\d\d?)\Z/
 
   def parse_month_param(param)
-    if RE_MONTH_RANGE =~ param
+    if RE_MONTH_RANGE_PARAM =~ param
       start_month = int_from_str(Regexp.last_match(:start_month_param))
       end_month = int_from_str(Regexp.last_match(:end_month_param))
     else
       start_month = end_month = int_from_str(param)
     end
     
-    abort USAGE_MSG unless legal_month_params?(start_month, end_month)
+    abort USAGE_MSG unless legal_month_range?(start_month, end_month)
 
     [start_month, end_month]
   end
@@ -284,7 +283,7 @@ class Runner
     abort USAGE_MSG
   end
 
-  def legal_month_params?(start_month, end_month)
+  def legal_month_range?(start_month, end_month)
     (1..12).include?(start_month) &&
       (1..12).include?(end_month) &&
       start_month <= end_month
@@ -299,7 +298,7 @@ class Runner
 
     case ARGV.size
     when 0                                      
-      # no params = current month only
+      # no params => current month only
       start_month = end_month = Time.now.month
       year = Time.now.year
     when 1
