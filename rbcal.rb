@@ -148,21 +148,21 @@ class SpecialDates
     holidays = FIXED_HOLIDAYS
     easter_val = easter  # calculate only once
     ascension_day = easter_val + 39
-    holidays <<
-      day_month(easter_val) <<
-      day_month(easter_val - 2) <<          # Good Friday
-      day_month(easter_val - 1) <<          # Easter Saturday
-      day_month(easter_val + 1) <<          # Monday after Easter
-      day_month(ascension_day) <<       # Finnish "Helatorstai"
-      day_month(midsummer_eve) <<
-      day_month(midsummer_eve + 1) <<
-      day_month(all_hallows_day)
+    holidays +=
+      [day_month(easter_val),
+       day_month(easter_val - 2),      # Good Friday
+       day_month(easter_val - 1),      # Easter Saturday
+       day_month(easter_val + 1),      # Monday after Easter
+       day_month(ascension_day),       # Finnish "Helatorstai"
+       day_month(midsummer_eve),
+       day_month(midsummer_eve + 1),
+       day_month(all_hallows_day)
+      ]
   end
 
   def init_personal_hilights
     hilights = read_hilight_days_from_config_file
     hilights += standard_hilight_days
-    hilights
   end
 
   def read_hilight_days_from_config_file
@@ -172,17 +172,19 @@ class SpecialDates
       f.each_line do |line|
         next if line.start_with?("#") || line =~ /^\s*\n$/
         day_str, month_str, year_str = line.split(' ')
-        hilights << [day_str.to_i, month_str.to_i] if !year_str || year_str.to_i == @year
+        hilights << [day_str.to_i, month_str.to_i] if year_str.nil? || (year_str.to_i == @year)
       end
     end
     hilights
   end
 
   def standard_hilight_days
-    [] << day_month(mothers_day) <<
-      day_month(fathers_day) <<
-      day_month(daylight_saving_start) <<
-      day_month(daylight_saving_end)
+    [
+     day_month(mothers_day),
+     day_month(fathers_day),
+     day_month(daylight_saving_start),
+     day_month(daylight_saving_end)
+    ]
   end
 
   def day_month(date)
