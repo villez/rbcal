@@ -13,6 +13,7 @@ class RbCal
   EMPTY_WEEK_ROW = " " * WEEK_ROW_LEN
   DEFAULT_COLUMNS = 3
   EMPTY_DAY_STR = "   "
+  MONTH_GUTTER = "  "
 
   def initialize(start_month, end_month, year)
     @start_month = @month = start_month
@@ -21,73 +22,69 @@ class RbCal
     @special_dates = SpecialDates.new(year)
   end
 
-
-  def print_cal
-    print_month_range(DEFAULT_COLUMNS)
-    puts
+  def print_cal(columns = DEFAULT_COLUMNS)
+    (@start_month..@end_month).each_slice(columns) do |month_slice|
+      print_months_side_by_side(month_slice)
+      puts
+    end
   end
 
-  def print_month_range(cols = DEFAULT_COLUMNS)
-    (@start_month..@end_month).each_slice(cols) do |months|
-      print_months_side_by_side(months_as_str_arrays(months))
-      puts if months.last != @end_month  # extra newline only in between, not after last month row
+  def print_months_side_by_side(month_slice)
+    month_string_arrays = months_as_str_arrays(month_slice)
+    week_line_range = (0...month_string_arrays.map(&:size).max)
+
+    month_slice_string = week_line_range.map do |line_idx|
+      combined_week_row(month_string_arrays, month_slice, line_idx)
+    end.join
+    puts month_slice_string
+  end
+
+  def combined_week_row(month_string_arrays, month_slice, index)
+    line_str = ""
+    
+    month_string_arrays.each do |month|
+      line_str << month.fetch(index, EMPTY_WEEK_ROW)
+      line_str << MONTH_GUTTER unless month == month_string_arrays.last
     end
+    line_str << "\n"
   end
 
   def months_as_str_arrays(months)
-    month_str_arrays = []
-    months.each do |i|
-      @month = i
-      @first_day_of_month = Date.new(@year, @month, 1)
-      month_str_arrays << month_grid_str.split("\n")
-    end
-    month_str_arrays
+    months.map { |month| month_grid_str(month).split("\n") }
   end
 
-  def print_months_side_by_side(month_str_arrays)
-    # different months may have different amount of weeks ->
-    # different amount of rows; need to find max for correct printing
-    linecount = month_str_arrays.map { |ma| ma.size }.max
-    combined_month_str = ""
-
-    (0...linecount).each do |i|           # into each line
-      month_str_arrays.each do |ma|       # get a week string from each month
-        combined_month_str << ma.fetch(i, EMPTY_WEEK_ROW)
-        combined_month_str << "  " unless ma == month_str_arrays.last
-      end
-      combined_month_str << "\n"
-    end
-    puts combined_month_str
+  def first_day_of_month(month)
+    Date.new(@year, month, 1)
   end
 
-  def month_grid_str
-    month_header + weekday_header + week_rows_for_month
+  def month_grid_str(month)
+    month_header(month) + weekday_header + week_rows_for_month(month)
   end
 
-  def month_header
-    @first_day_of_month.strftime("%B %Y").center(WEEK_ROW_LEN) + "\n"
+  def month_header(month)
+    first_day_of_month(month).strftime("%B %Y").center(WEEK_ROW_LEN) + "\n"
   end
 
   def weekday_header
     "Wk  Mo Tu We Th Fr Sa Su \n"
   end
 
-  def week_rows_for_month
-    current_day = @first_day_of_month
+  def week_rows_for_month(month)
+    current_day = first_day_of_month(month)
     month_weeks_grid_str = ""
-    while current_day.month == @month
-      current_week_str, next_week_first_day = week_row(current_day)
+    while current_day.month == month
+      current_week_str, next_week_first_day = week_row(month, current_day)
       month_weeks_grid_str << current_week_str
       current_day = next_week_first_day
     end
     month_weeks_grid_str
   end
 
-  def week_row(current_day)
+  def week_row(month, current_day)
     current_week_str = week_number_str(current_day)
     current_week_str << EMPTY_DAY_STR * (current_day.cwday - 1) # padding if 1st not Monday
     (0..(7 - current_day.cwday)).each do |i|
-      if current_day.month == @month
+      if current_day.month == month
         current_week_str << day_str(current_day)
         current_day += 1
       else # ran over to next month, in the middle of the week
