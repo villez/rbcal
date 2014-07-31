@@ -7,8 +7,8 @@ require "date"
 
 class RbCal
 
-  # formatting constants; not really meant to be customized, but depending
-  # on terminal window size, 2 or 4 columns may be useful as well
+  # print formatting constants; not really meant to be customized;
+  # depending on terminal window size, 2 or 4 columns might be useful/usable as well
   WEEK_ROW_LEN = 25
   EMPTY_WEEK_ROW = " " * WEEK_ROW_LEN
   DEFAULT_COLUMNS = 3
@@ -16,14 +16,13 @@ class RbCal
   MONTH_GUTTER = "  "
 
   def initialize(start_month, end_month, year)
-    @start_month = @month = start_month
-    @end_month = end_month
+    @month_range = start_month..end_month
     @year = year
     @special_dates = SpecialDates.new(year)
   end
 
   def print_cal(columns = DEFAULT_COLUMNS)
-    (@start_month..@end_month).each_slice(columns) do |month_slice|
+    @month_range.each_slice(columns) do |month_slice|
       print_months_side_by_side(month_slice)
       puts
     end
@@ -89,21 +88,21 @@ class RbCal
       end
     end
 
-    current_week_str << "\n"
-    [current_week_str, current_day] # when month still unfinished, current_day = 1st day of next week
+    week_str << "\n"
+    [week_str, current_day] # when month still unfinished, current_day = 1st day of next week
   end
 
   def week_number_str(current_day)
     colorize_string("%02d  " % current_day.cweek, :green)
-  end
+  end  
 
   def day_str(date)
     daystr = "%02d " % date.day
     if date == Time.now.to_date
       daystr = colorize_string(daystr, :blue)
-    elsif @special_dates.holiday?(date.day, date.mon)
+    elsif @special_dates.holiday?(date)
       daystr = colorize_string(daystr, :red)
-    elsif @special_dates.personal_hilight?(date.day, date.mon)
+    elsif @special_dates.personal_hilight?(date)
       daystr = colorize_string(daystr, :yellow)
     end
     daystr
@@ -125,73 +124,64 @@ class SpecialDates
 
   def initialize(year)
     @year = year
-    @holidays = init_holidays
-    @personal_hilights = init_personal_hilights
+    @holidays = holidays
+    @personal_hilights = hilight_days_from_config_file + common_finnish_hilight_days
   end
 
-  def holiday?(day, month)
-    @holidays.include?([day, month])
+  def holiday?(date)
+    @holidays.include?(date)
   end
 
-  def personal_hilight?(day, month)
-    @personal_hilights.include?([day, month])
+  def personal_hilight?(date)
+    @personal_hilights.include?(date)
   end
 
-  def init_holidays
-    holidays = FIXED_HOLIDAYS
-    easter_val = easter  # calculate only once
-    ascension_day = easter_val + 39
-    holidays +=
-      [day_month(easter_val),
-       day_month(easter_val - 2),      # Good Friday
-       day_month(easter_val - 1),      # Easter Saturday
-       day_month(easter_val + 1),      # Monday after Easter
-       day_month(ascension_day),       # Finnish "Helatorstai"
-       day_month(midsummer_eve),
-       day_month(midsummer_eve + 1),
-       day_month(all_hallows_day)
-      ]
+  def holidays
+    holidays = FIXED_HOLIDAYS.map { |day| Date.new(@year, day[1], day[0]) }
+    easter_date = easter  # calculate easter location only once, use many times below
+    holidays += [
+                 easter_date,
+                 easter_date - 2,      # Good Friday
+                 easter_date - 1,      # Easter Saturday
+                 easter_date + 1,      # Monday after Easter
+                 easter_date + 39,     # Ascension Day, Finnish "Helatorstai"
+                 midsummer_eve,
+                 midsummer_eve + 1,
+                 all_hallows_day
+                ]
   end
 
-  def init_personal_hilights
-    hilights = read_hilight_days_from_config_file
-    hilights += standard_hilight_days
-  end
-
-  def read_hilight_days_from_config_file
+  def hilight_days_from_config_file
     hilights = []
     return hilights unless File.exist? CONFIG_FILE
-    File.open(CONFIG_FILE, 'r') do |f|
-      f.each_line do |line|
-        next if line.start_with?("#") || line =~ /^\s*\n$/
-        day_str, month_str, year_str = line.split(' ')
-        hilights << [day_str.to_i, month_str.to_i] if year_str.nil? || (year_str.to_i == @year)
-      end
+    
+    File.readlines(CONFIG_FILE).each do |line|
+      next if line.start_with?("#") || line =~ /^\s*\n$/
+      day, month, year = line.split(' ').map(&:to_i)
+      year = @year if year.nil? || year == 0
+      hilights << Date.new(year, month, day)
     end
+    
     hilights
   end
 
-  def standard_hilight_days
+  def common_finnish_hilight_days
     [
-     day_month(mothers_day),
-     day_month(fathers_day),
-     day_month(daylight_saving_start),
-     day_month(daylight_saving_end)
+     mothers_day,
+     fathers_day,
+     daylight_saving_start,
+     daylight_saving_end
     ]
   end
 
-  def day_month(date)
-    [date.day, date.month]
-  end
-
-  def midsummer_eve # the Friday between 19-25 June
+  def midsummer_eve   # the Friday between 19-25 June
     (19..25).each do |x|
       d = Date.new(@year, 6, x)
       return d if d.friday?
     end
   end
 
-  def all_hallows_day # the Saturday between Oct 31 and Nov 6
+  def all_hallows_day  # the Saturday between Oct 31 and Nov 6
     d = Date.new(@year, 10, 31)
     return d if d.saturday?
 
