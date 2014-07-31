@@ -30,28 +30,24 @@ class RbCal
   end
 
   def print_months_side_by_side(month_slice)
-    month_string_arrays = months_as_str_arrays(month_slice)
-    week_line_range = (0...month_string_arrays.map(&:size).max)
-
-    month_slice_string = week_line_range.map do |line_idx|
-      combined_week_row(month_string_arrays, month_slice, line_idx)
+    month_grids = month_slice.map { |month| month_grid_str(month).split("\n") } 
+    week_line_range = (0...month_grids.map(&:size).max)
+    combined_month_string = week_line_range.map do |line_idx|
+      combined_week_row_for_months(month_grids, month_slice, line_idx)
     end.join
-    puts month_slice_string
+    puts combined_month_string
   end
 
-  def combined_week_row(month_string_arrays, month_slice, index)
-    line_str = ""
+  def combined_week_row_for_months(month_grids, month_slice, index)
+    week_row = ""
     
-    month_string_arrays.each do |month|
-      line_str << month.fetch(index, EMPTY_WEEK_ROW)
-      line_str << MONTH_GUTTER unless month == month_string_arrays.last
+    month_grids.each do |month|
+      week_row << month.fetch(index, EMPTY_WEEK_ROW)
+      week_row << MONTH_GUTTER unless month == month_grids.last
     end
-    line_str << "\n"
+    week_row << "\n"
   end
 
-  def months_as_str_arrays(months)
-    months.map { |month| month_grid_str(month).split("\n") }
-  end
 
   def first_day_of_month(month)
     Date.new(@year, month, 1)
@@ -70,25 +66,25 @@ class RbCal
   end
 
   def week_rows_for_month(month)
+    week_str = ""
     current_day = first_day_of_month(month)
-    month_weeks_grid_str = ""
     while current_day.month == month
-      current_week_str, next_week_first_day = week_row(month, current_day)
-      month_weeks_grid_str << current_week_str
-      current_day = next_week_first_day
+      current_week_str, current_day = process_week(month, current_day)
+      week_str << current_week_str
     end
-    month_weeks_grid_str
+    week_str
   end
 
-  def week_row(month, current_day)
-    current_week_str = week_number_str(current_day)
-    current_week_str << EMPTY_DAY_STR * (current_day.cwday - 1) # padding if 1st not Monday
+  def process_week(month, current_day)
+    week_str = ""
+    week_str << week_number_str(current_day)
+    week_str << EMPTY_DAY_STR * (current_day.cwday - 1) # padding if 1st not Monday
     (0..(7 - current_day.cwday)).each do |i|
       if current_day.month == month
-        current_week_str << day_str(current_day)
+        week_str << day_str(current_day)
         current_day += 1
-      else # ran over to next month, in the middle of the week
-        current_week_str << EMPTY_DAY_STR * (7 - i)  # add padding to end of last week in month
+      else # ran over to next month in the middle of the week
+        week_str << EMPTY_DAY_STR * (7 - i)  # add padding to end of last week in month
         break
       end
     end
