@@ -153,7 +153,7 @@ class SpecialDates
 
   def hilight_days_from_config_file
     hilights = []
-    return hilights unless File.exist? CONFIG_FILE
+    return hilights unless File.exist?(CONFIG_FILE)
     
     File.readlines(CONFIG_FILE).each do |line|
       next if line.start_with?("#") || line =~ /^\s*\n$/
