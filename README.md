@@ -1,6 +1,6 @@
 # rbcal
 
-A simple replacement for the Unix cal/ncal command, written in Ruby. 
+A Unix cal/ncal command replacement, written in Ruby. 
 
 ## Features
 
@@ -26,22 +26,22 @@ in other countries.
 	rbcal 05 2014       # display May 2014
 	rbcal 10-12 2013    # display Oct-Dec 2013
 	rbcal 7-10          # display July-October for current year
-    rbcal 2015          # display show full year 2015
+    rbcal 2015          # display full year, Jan-Dec 2015
 
 ## Installing
 
-Note: requires Ruby 1.9+ - exact version cutoff not determined, as I'm
-primarily using 2.x myself. The reason is mainly because it uses the
-`Date` stdlib class heavily, and some of the features aren't available
-in 1.8.7. It should be feasible to implement all the same
-functionality in an 1.8 compatible way, but currently I have no
-interest in doing that.
+Requirements: Ruby 1.9.x+/2.x - does *NOT* work with Ruby 1.8.7. The
+exact version cutoff not determined. The reason is mainly because the
+program uses the `Date` stdlib class heavily, and some of the features
+aren't available in 1.8.7, and it has been end-of-lifed anyway so I
+have no interest in putting in extra effort to support it.
 
-Just run `./install.sh` But note! The install.sh script is very basic,
-it just copies the main script into ~/bin/rbcal and the example
-configuration file into ~/.rbcal but doesn't do much error checking,
-except not overwriting a previous configuration file. Use carefully,
-and make sure the ~/bin directory exists beforehand.
+There is a simple shell script to install the program for use,
+`install.sh` However it's very basic and just copies the main script
+into ~/bin/rbcal and the example configuration file into ~/.rbcal but
+doesn't do much error checking, except not overwriting a previous
+configuration file. Use carefully, and make sure the ~/bin directory
+exists beforehand. You can easily do the same thing manually.
 
 
 ## Future Features
