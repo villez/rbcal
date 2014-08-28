@@ -41,7 +41,20 @@ There is a simple shell script to install the program for use,
 into ~/bin/rbcal and the example configuration file into ~/.rbcal but
 doesn't do much error checking, except not overwriting a previous
 configuration file. Use carefully, and make sure the ~/bin directory
-exists beforehand. You can easily do the same thing manually.
+exists beforehand. You can also easily do the same thing manually and
+choose where to put the script, whether to include the config file or
+not, etc.
+
+## The Configuration File
+
+The ~/.rbcal configuration file is a simple text file that lists dates
+that should be highlighted. The dates are listed each on their own row
+with the format `day month [year]`, meaning that year is optional, and
+if it's not given, the date is highlighted for all years. There's no
+annotation for the dates, as in the calendar display there's no room
+for showing the reason for highlighting each day. This feature isn't
+meant to be a replacement for a full-blown calendar app with
+appointments, alerts etc., just reminders that certain dates are noteworthy.
 
 
 ## Future Features
