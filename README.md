@@ -6,7 +6,7 @@ A Unix cal/ncal command replacement, written in Ruby.
 
 Doesn't support all the options in the stock Unix/Linux/OS X versions,
 such as handling Julian calendars, etc. However, it does have a few
-additional potentially useful features:
+additional features:
 
  * displaying an arbitrary month range (currently only within the same year)
  * always show week numbers to the left
@@ -28,9 +28,10 @@ in other countries.
 	rbcal 7-10          # display July-October for current year
     rbcal 2015          # display full year, Jan-Dec 2015
 
+
 ## Installing
 
-Requirements: Ruby 1.9.x+/2.x - does *NOT* work with Ruby 1.8.7. The
+Requires Ruby 1.9.x+/2.x - does *NOT* work with Ruby 1.8.7. The
 exact version cutoff not determined. The reason is mainly because the
 program uses the `Date` stdlib class heavily, and some of the features
 aren't available in 1.8.7, and it has been end-of-lifed anyway so I
@@ -49,23 +50,25 @@ not, etc.
 
 The ~/.rbcal configuration file is a simple text file that lists dates
 that should be highlighted. The dates are listed each on their own row
-with the format `day month [year]`, meaning that year is optional, and
-if it's not given, the date is highlighted for all years. There's no
-annotation for the dates, as in the calendar display there's no room
-for showing the reason for highlighting each day. This feature isn't
-meant to be a replacement for a full-blown calendar app with
-appointments, alerts etc., just reminders that certain dates are noteworthy.
+with the format `day month [year]`, meaning that the year is optional,
+and if it's not provided, the date is highlighted for all
+years. There's no annotation for the dates, as in the calendar display
+there's no room for showing the reason for highlighting each day. This
+feature isn't meant to be a replacement for a full-blown calendar app
+with appointments, alerts etc., just reminders that certain dates are
+noteworthy.
 
 
-## Future Features
+## Future Development
 
 No active further development planned, but possible enhancements
 could include:
 
- * options to suppress/customize color output
- * other output formatting options (e.g. specifying the number of columns)
  * possibility to display a month range across different years,
    such as 11-2013 - 03-2014
+ * options to suppress/customize color output
+ * other output formatting options (e.g. specifying the number of
+   columns, leaving out week numbers)
 
 
 ## Copyright & License
