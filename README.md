@@ -31,11 +31,12 @@ in other countries.
 
 ## Installing
 
-Requires Ruby 1.9.x+/2.x - does *NOT* work with Ruby 1.8.7. The
-exact version cutoff not determined. The reason is mainly because the
-program uses the `Date` stdlib class heavily, and some of the features
-aren't available in 1.8.7, and it has been end-of-lifed anyway so I
-have no interest in putting in extra effort to support it.
+Requires Ruby 1.9.x/2.x - does *NOT* work with Ruby 1.8.7. The exact
+version cutoff hasn't been determined. The reason is mainly because
+the program utilizes the `Date` stdlib class heavily, and some of the
+features used aren't available in 1.8.7; since it has been
+end-of-lifed anyway, I have no interest in putting in extra effort
+to support it even though that is technically feasible.
 
 There is a simple shell script to install the program for use,
 `install.sh` However it's very basic and just copies the main script
@@ -61,14 +62,14 @@ noteworthy.
 
 ## Future Development
 
-No active further development planned, but possible enhancements
-could include:
+Possible enhancements, no concrete implementation plan or schedule at
+the moment: 
 
- * possibility to display a month range across different years,
+ * displaying a month range across different years,
    such as 11-2013 - 03-2014
- * options to suppress/customize color output
- * other output formatting options (e.g. specifying the number of
-   columns, leaving out week numbers)
+ * options to customize color output or turn it off completely
+ * other output formatting options, e.g. specifying the number of
+   columns, leaving out week numbers, ...
 
 
 ## Copyright & License
