@@ -39,17 +39,17 @@ end-of-lifed anyway, I have no interest in putting in extra effort
 to support it even though that is technically feasible.
 
 There is a simple shell script to install the program for use,
-`install.sh` However it's very basic and just copies the main script
-into ~/bin/rbcal and the example configuration file into ~/.rbcal but
-doesn't do much error checking, except not overwriting a previous
-configuration file. Use carefully, and make sure the ~/bin directory
+`install`. However it's very basic and just copies the main script
+into `~/bin/rbcal` and the example configuration file into `~/.rbcal`
+but doesn't do much error checking, except not overwriting a previous
+configuration file. Use carefully, and make sure the `~/bin` directory
 exists beforehand. You can also easily do the same thing manually and
-choose where to put the script, whether to include the config file or
-not, etc.
+choose where to put the script, what to name it, whether to include
+the config file or not, etc.
 
 ## The Configuration File
 
-The ~/.rbcal configuration file is a simple text file that lists dates
+The `~/.rbcal` configuration file is a simple text file that lists dates
 that should be highlighted. The dates are listed each on their own row
 with the format `day month [year]`, meaning that the year is optional,
 and if it's not provided, the date is highlighted for all
