@@ -40,12 +40,13 @@ to support it even though that is technically feasible.
 
 There is a simple shell script to install the program for use,
 `install`. However it's very basic and just copies the main script
-into `~/bin/rbcal` and the example configuration file into `~/.rbcal`
-but doesn't do much error checking, except not overwriting a previous
-configuration file. Use carefully, and make sure the `~/bin` directory
-exists beforehand. You can also easily do the same thing manually and
-choose where to put the script, what to name it, whether to include
-the config file or not, etc.
+into `~/bin/rbcal` and the example configuration file into `~/.rbcal`.
+
+The install script isn't extremely robust, but it does check that the
+`~/bin` directory exists and doesn't overwrite a previous
+configuration file (`~/.rbcal`). You can also easily do the same thing
+manually and choose where to put the script, what to name it, whether
+to include the config file or not, etc.
 
 ## The Configuration File
 

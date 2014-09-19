@@ -2,11 +2,18 @@
 # installing the calendar script as an executable script
 # under ~/bin and the configuration file as ~/.rbcal
 
+if [ -d "$HOME/bin" ]; then
 
-echo "installing binary as ~/bin/rbcal"
-
-cp ./rbcal.rb ~/bin/rbcal
-chmod a+x ~/bin/rbcal
+    echo "installing binary as ~/bin/rbcal"
+    
+    cp ./rbcal.rb ~/bin/rbcal
+    chmod a+x ~/bin/rbcal
+else
+    echo "The directory ~/bin doesn't exist; either create it and rerun install"
+    echo "or copy the file rbcal.rb manually to a location in your path with a"
+    echo "name of your choosing."
+    exit
+fi
 
 if [ -f "$HOME/.rbcal" ]; then
     echo "~/.rbcal exists already, not overwriting"
