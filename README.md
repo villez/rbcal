@@ -35,8 +35,10 @@ Requires Ruby 1.9.x/2.x - does *NOT* work with Ruby 1.8.7. The exact
 version cutoff hasn't been determined. The reason is mainly because
 the program utilizes the `Date` stdlib class heavily, and some of the
 features used aren't available in 1.8.7; since it has been
-end-of-lifed anyway, I have no interest in putting in extra effort
-to support it even though that is technically feasible.
+end-of-lifed already, I have no interest in doing the workarounds to
+support it. Also, recent versions not tested with 1.9.x either,
+and 1.9.3 will reach end of support in 2015 as well, so no plans to
+put effort into that either.
 
 There is a simple shell script to install the program for use,
 `install`. However it's very basic and just copies the main script
