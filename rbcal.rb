@@ -119,8 +119,12 @@ class RbCal
   end
 end
 
-
+# a utility class for handling dates to be highlighted, including reading
+# from the config file (~/.rbcal), storing common Finnish holidays, and
+# calculating the dates for moving holidays per year according to predefined
+# rules
 class SpecialDates
+  
   # predefined fixed holiday dates to highlight - [day, month]
   # Note! based on the Finnish calendar
   FIXED_HOLIDAYS = [[1, 1], [6, 1], [1, 5], [6, 12], [24, 12], [25, 12], [26, 12]]
@@ -143,16 +147,16 @@ class SpecialDates
   def holidays
     holidays = FIXED_HOLIDAYS.map { |day| Date.new(@year, day[1], day[0]) }
     easter_date = easter  # calculate easter location only once, use many times below
-    holidays += [
-                 easter_date,
-                 easter_date - 2,      # Good Friday
-                 easter_date - 1,      # Easter Saturday
-                 easter_date + 1,      # Monday after Easter
-                 easter_date + 39,     # Ascension Day, Finnish "Helatorstai"
-                 midsummer_eve,
-                 midsummer_eve + 1,
-                 all_hallows_day
-                ]
+    holidays + [
+                easter_date,
+                easter_date - 2,      # Good Friday
+                easter_date - 1,      # Easter Saturday
+                easter_date + 1,      # Monday after Easter
+                easter_date + 39,     # Ascension Day, Finnish "Helatorstai"
+                midsummer_eve,
+                midsummer_eve + 1,
+                all_hallows_day
+               ]
   end
 
   def hilight_days_from_config_file
