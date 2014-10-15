@@ -36,12 +36,12 @@ class RbCal
     month_grids = month_slice.map { |month| month_grid_str(month).split("\n") } 
     week_line_range = (0...month_grids.map(&:size).max)
     combined_month_string = week_line_range.map do |line_idx|
-      combined_week_row_for_months(month_grids, month_slice, line_idx)
+      combined_week_row_for_months(month_grids, line_idx)
     end.join
     puts combined_month_string
   end
 
-  def combined_week_row_for_months(month_grids, month_slice, index)
+  def combined_week_row_for_months(month_grids, index)
     week_row = ""
     
     month_grids.each do |month|
