@@ -1,14 +1,15 @@
 # rbcal
 
-A Unix cal/ncal command replacement, written in Ruby. 
+A command line calendar viewer written in Ruby, doing the same basic
+task as the Unix cal/ncal utilities.
 
 ## Features
 
 Doesn't support all the options in the stock Unix/Linux/OS X versions,
-such as handling Julian calendars, etc. However, it does have a few
+such as handling Julian calendars, etc. However, has a few
 additional features:
 
- * displaying an arbitrary month range (currently only within the same year)
+ * displaying a month range (currently only within the same year)
  * always show week numbers to the left
  * use ANSI colors to highlight the current date, public holidays,
    and other "notable" dates, like daylight saving time changes
@@ -28,17 +29,22 @@ in other countries.
 	rbcal 7-10          # display July-October for current year
     rbcal 2015          # display full year, Jan-Dec 2015
 
+So the supported parameter combinations are:
+
+* no parameters: display the current month only
+* a single parameter: the year to display in full
+* two numbers separated by a dash: a month range for the current year
+* two numbers separated by a space: month and year
+* two dash-separated numbers + 3rd number: month range and year
+
 
 ## Installing
 
-Requires Ruby 1.9.x/2.x - does *NOT* work with Ruby 1.8.7. The exact
-version cutoff hasn't been determined. The reason is mainly because
-the program utilizes the `Date` stdlib class heavily, and some of the
-features used aren't available in 1.8.7; since it has been
-end-of-lifed already, I have no interest in doing the workarounds to
-support it. Also, recent versions not tested with 1.9.x either,
-and 1.9.3 will reach end of support in 2015 as well, so no plans to
-put effort into that either.
+Ruby 2.x strongly recommended; may work with 1.9.x but no longer
+tested with those. Does *NOT* work with Ruby 1.8.7, mainly because the
+program utilizes the `Date` stdlib class heavily, and some of the
+features used aren't available in 1.8.7, which has been end-of-lifed
+anyway.
 
 There is a simple shell script to install the program for use,
 `install`. However it's very basic and just copies the main script
@@ -53,14 +59,17 @@ to include the config file or not, etc.
 ## The Configuration File
 
 The `~/.rbcal` configuration file is a simple text file that lists dates
-that should be highlighted. The dates are listed each on their own row
-with the format `day month [year]`, meaning that the year is optional,
-and if it's not provided, the date is highlighted for all
-years. There's no annotation for the dates, as in the calendar display
-there's no room for showing the reason for highlighting each day. This
-feature isn't meant to be a replacement for a full-blown calendar app
-with appointments, alerts etc., just reminders that certain dates are
-noteworthy.
+that should be highlighted. It's optional, so if you don't wish to
+configure custom highlight dates with it, you can leave it out or
+remove it.
+
+The dates are listed each on their own row with the format `day month
+[year]`, meaning that the year is optional, and if it's not provided,
+the date is highlighted for all years. There isn't any kind of
+annotation for the dates, because in the calendar display there's no
+room for showing any additional information. This feature isn't meant
+to be a replacement for a full-blown calendar app with appointments,
+alerts etc., just reminders that certain dates are noteworthy.
 
 
 ## Future Development
@@ -73,6 +82,9 @@ the moment:
  * options to customize color output or turn it off completely
  * other output formatting options, e.g. specifying the number of
    columns, leaving out week numbers, ...
+ * making the configuration file format and parsing more robust,
+   e.g. verifying that end-of-line # comments work in all
+   combinations, etc.
 
 
 ## Copyright & License
