@@ -34,17 +34,17 @@ So the supported parameter combinations are:
 * no parameters: display the current month only
 * a single parameter: the year to display in full
 * two numbers separated by a dash: a month range for the current year
+  (first number must be smaller than the second one)
 * two numbers separated by a space: month and year
 * two dash-separated numbers + 3rd number: month range and year
 
 
 ## Installing
 
-Ruby 2.x strongly recommended; may work with 1.9.x but no longer
-tested with those. Does *NOT* work with Ruby 1.8.7, mainly because the
-program utilizes the `Date` stdlib class heavily, and some of the
-features used aren't available in 1.8.7, which has been end-of-lifed
-anyway.
+Ruby 2.x recommended; may work with 1.9.x but no longer tested. Does
+*NOT* work with Ruby 1.8.7, mainly because the program utilizes the
+`Date` stdlib class heavily, and some of the features used aren't
+available in 1.8.7, which has been end-of-lifed anyway.
 
 There is a simple shell script to install the program for use,
 `install`. However it's very basic and just copies the main script
@@ -56,23 +56,27 @@ configuration file (`~/.rbcal`). You can also easily do the same thing
 manually and choose where to put the script, what to name it, whether
 to include the config file or not, etc.
 
+
 ## The Configuration File
 
-The `~/.rbcal` configuration file is a simple text file that lists dates
-that should be highlighted. It's optional, so if you don't wish to
-configure custom highlight dates with it, you can leave it out or
-remove it.
+The `~/.rbcal` configuration file is a simple text file that lists
+dates that should be highlighted in the calendar display. It's
+optional, so if you don't wish to configure custom highlight dates
+with it, you can safely leave it out or remove it.
 
 The dates are listed each on their own row with the format `day month
 [year]`, meaning that the year is optional, and if it's not provided,
-the date is highlighted for all years. There isn't any kind of
-annotation for the dates, because in the calendar display there's no
-room for showing any additional information. This feature isn't meant
-to be a replacement for a full-blown calendar app with appointments,
-alerts etc., just reminders that certain dates are noteworthy.
+the date is highlighted for all years. If the year is provided, the
+date is highlighted only for that specific year.
+
+There isn't any kind of annotation for the dates, because in the
+calendar display there's no room for showing any additional
+information. Also, this feature isn't really meant to be a replacement
+for a full-blown calendar app with appointments, alerts etc., just
+simple reminders that certain dates are "noteworthy" in some way.
 
 
-## Future Development
+## Future Development Items
 
 Possible enhancements, no concrete implementation plan or schedule at
 the moment: 
