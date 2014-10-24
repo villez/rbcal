@@ -89,6 +89,8 @@ the moment:
  * making the configuration file format and parsing more robust,
    e.g. verifying that end-of-line # comments work in all
    combinations, etc.
+ * supporting holidays for other countries than Finland; making it
+   configurable through options or the configuration file
 
 
 ## Copyright & License
