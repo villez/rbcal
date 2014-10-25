@@ -9,14 +9,17 @@
 
 require "date"
 
+# The class that takes care of printing the calendar based on
+# the starting & ending month and year parameters; utilizes the
+# SpecialDates class for detecting dates to highlight 
 class RbCal
 
   # print formatting constants; not really meant to be customized;
   # depending on terminal window size, 2 or 4 columns might be useful/usable as well
   WEEK_ROW_LEN = 25
   EMPTY_WEEK_ROW = " " * WEEK_ROW_LEN
-  DEFAULT_COLUMNS = 3
-  EMPTY_DAY_STR = "   "
+  DEFAULT_COLUMN_AMOUNT = 3
+  EMPTY_DAY = "   "
   MONTH_GUTTER = "  "
 
   def initialize(start_month, end_month, year)
@@ -25,20 +28,20 @@ class RbCal
     @special_dates = SpecialDates.new(year)
   end
 
-  def print_cal(columns = DEFAULT_COLUMNS)
-    @month_range.each_slice(columns) do |month_slice|
+  def print_calendar(column_amount = DEFAULT_COLUMN_AMOUNT)
+    @month_range.each_slice(column_amount) do |month_slice|
       print_months_side_by_side(month_slice)
-      puts
     end
   end
 
   def print_months_side_by_side(month_slice)
-    month_grids = month_slice.map { |month| month_grid_str(month).split("\n") } 
+    month_grids = month_slice.map { |month| month_display_grid(month).split("\n") } 
     week_line_range = (0...month_grids.map(&:size).max)
     combined_month_string = week_line_range.map do |line_idx|
       combined_week_row_for_months(month_grids, line_idx)
     end.join
     puts combined_month_string
+    puts
   end
 
   def combined_week_row_for_months(month_grids, index)
@@ -56,8 +59,8 @@ class RbCal
     Date.new(@year, month, 1)
   end
 
-  def month_grid_str(month)
-    month_header(month) + weekday_header + week_rows_for_month(month)
+  def month_display_grid(month)
+    month_header(month) + weekday_header + weeks_for_month(month)
   end
 
   def month_header(month)
@@ -68,49 +71,62 @@ class RbCal
     "Wk  Mo Tu We Th Fr Sa Su \n"
   end
 
-  def week_rows_for_month(month)
-    week_str = ""
-    current_day = first_day_of_month(month)
-    while current_day.month == month
-      current_week_str, current_day = process_week(month, current_day)
-      week_str << current_week_str
+  def weeks_for_month(month)
+    weeks = ""
+    day = first_day_of_month(month)
+    while day.month == month
+      week, day = week_display(month, day)
+      weeks << week
     end
-    week_str
+    weeks
   end
 
-  def process_week(month, current_day)
-    week_str = ""
-    week_str << week_number_str(current_day)
-    week_str << EMPTY_DAY_STR * (current_day.cwday - 1) # padding if 1st not Monday
-    (0..(7 - current_day.cwday)).each do |i|
-      if current_day.month == month
-        week_str << day_str(current_day)
-        current_day += 1
+  def week_display(month, day)
+    week = ""
+    week << week_number_display(day)
+    week << EMPTY_DAY * (day.cwday - 1) # padding if 1st not Monday
+    (0..(7 - day.cwday)).each do |i|
+      if day.month == month
+        week << day_display(day)
+        day += 1
       else # ran over to next month in the middle of the week
-        week_str << EMPTY_DAY_STR * (7 - i)  # add padding to end of last week in month
+        week << EMPTY_DAY * (7 - i)  # add padding to end of last week in month
         break
       end
     end
 
-    week_str << "\n"
-    [week_str, current_day] # when month still unfinished, current_day = 1st day of next week
+    week << "\n"
+    [week, day] # when month still unfinished, day = 1st day of next week
   end
 
-  def week_number_str(current_day)
+  def week_number_display(current_day)
     colorize_string("%02d  " % current_day.cweek, :green)
   end  
 
-  def day_str(date)
-    daystr = "%02d " % date.day
+  def day_display(date)
+    formatted_day = "%02d " % date.day
     if date == Time.now.to_date
-      daystr = colorize_string(daystr, :blue)
+      formatted_day = format_today(formatted_day)
     elsif @special_dates.holiday?(date)
-      daystr = colorize_string(daystr, :red)
+      formatted_day = format_holiday(formatted_day)
     elsif @special_dates.personal_hilight?(date)
-      daystr = colorize_string(daystr, :yellow)
+      formatted_day = format_hilight(formatted_day)
     end
-    daystr
+    formatted_day
   end
+
+  def format_today(str)
+    colorize_string(str, :blue)
+  end
+
+  def format_holiday(str)
+    colorize_string(str, :red)
+  end
+
+  def format_hilight(str)
+    colorize_string(str, :yellow)
+  end
+  
 
   def colorize_string(str, color)
     # not a complete list of colors, but currently only need these 4
@@ -317,7 +333,7 @@ class Runner
   end
 
   def main
-    RbCal.new(*parse_command_line_parameters).print_cal
+    RbCal.new(*parse_command_line_parameters).print_calendar
   end
 end
 
