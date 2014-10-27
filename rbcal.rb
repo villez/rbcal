@@ -141,10 +141,18 @@ end
 # rules
 class SpecialDates
   
-  # predefined fixed holiday dates to highlight - [day, month]
-  # Note! based on the Finnish calendar
-  FIXED_HOLIDAYS = [[1, 1], [6, 1], [1, 5], [6, 12], [24, 12], [25, 12], [26, 12]]
   CONFIG_FILE = File.join(ENV["HOME"], ".rbcal")
+
+  # predefined fixed holidays (same date every year) to highlight
+  # the format is [day, month]
+  # Note! based on the Finnish calendar!
+  FIXED_HOLIDAYS = [[1, 1],   # New Year
+                    [6, 1],   # Epiphany
+                    [1, 5],   # Labor day
+                    [6, 12],  # Finnish independence day
+                    [24, 12], # Christmas days
+                    [25, 12],
+                    [26, 12]]
 
   def initialize(year)
     @year = year
