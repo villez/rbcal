@@ -86,16 +86,13 @@ the moment:
  * options to customize color output or turn it off completely
  * other output formatting options, e.g. specifying the number of
    columns, suppressing week number display, ...
- * option to turn off highlighting holidays etc. 
+ * option to turn off highlighting holidays etc.
  * making the configuration file format and parsing more robust,
-   e.g. verifying that end-of-line # comments work in all
-   combinations, etc.
- * supporting holidays for other countries than Finland and making it
-   configurable through options or the configuration file; not likely
-   to happen anytime soon, as would basically need external library
-   support - not really interested in investing the time to figure out
-   calendar rules for other countries myself
-
+   e.g. making sure end-of-line "#" comments work in all cases
+ * if add more command-line options: separate configuration files for
+   the options and for the highlighted dates?
+ * supporting holidays for other countries than Finland - not likely
+   to happen
 
 ## Copyright & License
 
