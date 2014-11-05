@@ -24,10 +24,10 @@ in other countries.
 ## Usage Examples
 
     rbcal               # display current month
+    rbcal 2015          # display full year, Jan-Dec 2015
+	rbcal 7-10          # display July-October for current year
 	rbcal 05 2014       # display May 2014
 	rbcal 10-12 2013    # display Oct-Dec 2013
-	rbcal 7-10          # display July-October for current year
-    rbcal 2015          # display full year, Jan-Dec 2015
 
 So the supported parameter combinations are:
 
@@ -62,7 +62,7 @@ to include the config file or not, etc.
 The `~/.rbcal` configuration file is a simple text file that lists
 dates that should be highlighted in the calendar display. It's
 optional, so if you don't wish to configure custom highlight dates
-with it, you can safely leave it out or remove it.
+with it, you can safely ignore it or even remove it.
 
 The dates are listed each on their own row with the format `day month
 [year]`, meaning that the year is optional, and if it's not provided,
