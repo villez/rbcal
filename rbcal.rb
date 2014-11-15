@@ -185,13 +185,15 @@ class SpecialDates
 
   def hilight_days_from_config_file
     hilights = []
+
     return hilights unless File.exist?(CONFIG_FILE)
     
     File.readlines(CONFIG_FILE).each do |line|
-      next if line.start_with?("#") || line =~ /^\s*\n$/
+      next if line !~ /^\d{1,2}\s\d{1,2}(\s\d{1,4})?.*$/
       day, month, year = line.split(' ').map(&:to_i)
-      year = @year if year.nil? || year == 0
-      hilights << Date.new(year, month, day)
+      year = @year if year.nil?
+      date = Date.new(year, month, day) rescue next  # protect from malformed config
+      hilights << date
     end
     
     hilights

@@ -87,8 +87,6 @@ the moment:
  * other output formatting options, e.g. specifying the number of
    columns, suppressing week number display, ...
  * option to turn off highlighting holidays etc.
- * making the configuration file format and parsing more robust,
-   e.g. making sure end-of-line "#" comments work in all cases
  * if add more command-line options: separate configuration files for
    the options and for the highlighted dates?
  * supporting holidays for other countries than Finland - not likely
