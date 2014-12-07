@@ -22,10 +22,10 @@ class RbCal
   EMPTY_DAY = "   "
   MONTH_GUTTER = "  "
 
-  def initialize(start_month, end_month, year)
-    @month_range = start_month..end_month
-    @year = year
-    @special_dates = SpecialDates.new(year)
+  def initialize(month_range)
+    @month_range = month_range.start_month..month_range.end_month
+    @year = month_range.start_year
+    @special_dates = SpecialDates.new(@year)
   end
 
   def print_calendar(column_amount = DEFAULT_COLUMN_AMOUNT)
@@ -276,8 +276,8 @@ class SpecialDates
   end
 end
 
-
-class Runner
+# parsing and validity checking the command-line arguments
+class ParamParser
   USAGE_MSG = "Usage: rbcal [[month | start_month-end_month] year]"
 
   RE_MONTH_RANGE_PARAM = /\A(?<start_month_param>\d\d?)-(?<end_month_param>\d\d?)\Z/
@@ -339,12 +339,14 @@ class Runner
       abort USAGE_MSG
     end
 
-    [start_month, end_month, year]
-  end
-
-  def main
-    RbCal.new(*parse_command_line_parameters).print_calendar
+    MonthRange.new(start_month, end_month, year, year)
   end
 end
 
-Runner.new.main
+# helper struct to hold a month range 
+MonthRange = Struct.new(:start_month, :end_month, :start_year, :end_year)
+
+
+month_range = ParamParser.new.parse_command_line_parameters
+RbCal.new(month_range).print_calendar
+
