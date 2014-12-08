@@ -9,6 +9,9 @@
 
 require "date"
 
+# helper struct to held a month with year
+Month = Struct.new(:month, :year)
+
 # The class that takes care of printing the calendar based on
 # the starting & ending month and year parameters; utilizes the
 # SpecialDates class for detecting dates to highlight 
@@ -22,10 +25,22 @@ class RbCal
   EMPTY_DAY = "   "
   MONTH_GUTTER = "  "
 
-  def initialize(month_range)
-    @month_range = month_range.start_month..month_range.end_month
-    @year = month_range.start_year
-    @special_dates = SpecialDates.new(@year)
+  def initialize(start_month, end_month)
+    @month_range = []
+    @special_dates = {}
+    @special_dates[start_month.year] = SpecialDates.new(start_month.year)
+    m = start_month.month
+    y = start_month.year
+    while y < end_month.year || (y == end_month.year &&  m <= end_month.month)
+      @month_range << Month.new(m, y)
+      unless m == 12
+        m = m + 1
+      else
+        m = 1
+        y = y + 1
+        @special_dates[y] = SpecialDates.new(y)
+      end
+    end
   end
 
   def print_calendar(column_amount = DEFAULT_COLUMN_AMOUNT)
@@ -35,7 +50,7 @@ class RbCal
   end
 
   def print_months_side_by_side(month_slice)
-    month_grids = month_slice.map { |month| month_display_grid(month).split("\n") } 
+    month_grids = month_slice.map { |month| month_display_grid(month).split("\n") }
     week_line_range = (0...month_grids.map(&:size).max)
     combined_month_string = week_line_range.map do |line_idx|
       combined_week_row_for_months(month_grids, line_idx)
@@ -56,7 +71,7 @@ class RbCal
 
 
   def first_day_of_month(month)
-    Date.new(@year, month, 1)
+    Date.new(month.year, month.month, 1)
   end
 
   def month_display_grid(month)
@@ -74,7 +89,7 @@ class RbCal
   def weeks_for_month(month)
     weeks = ""
     day = first_day_of_month(month)
-    while day.month == month
+    while day.month == month.month
       week, day = week_display(month, day)
       weeks << week
     end
@@ -86,7 +101,7 @@ class RbCal
     week << week_number_display(day)
     week << EMPTY_DAY * (day.cwday - 1) # padding if 1st not Monday
     (0..(7 - day.cwday)).each do |i|
-      if day.month == month
+      if day.month == month.month
         week << day_display(day)
         day += 1
       else # ran over to next month in the middle of the week
@@ -106,10 +121,10 @@ class RbCal
   def day_display(date)
     formatted_day = "%02d " % date.day
     if date == Time.now.to_date
-      formatted_day = format_today(formatted_day)
-    elsif @special_dates.holiday?(date)
+       formatted_day = format_today(formatted_day)
+    elsif @special_dates[date.year].holiday?(date)
       formatted_day = format_holiday(formatted_day)
-    elsif @special_dates.personal_hilight?(date)
+    elsif @special_dates[date.year].personal_hilight?(date)
       formatted_day = format_hilight(formatted_day)
     end
     formatted_day
@@ -304,8 +319,7 @@ class ParamParser
 
   def legal_month_range?(start_month, end_month)
     (1..12).include?(start_month) &&
-      (1..12).include?(end_month) &&
-      start_month <= end_month
+      (1..12).include?(end_month) 
   end
 
   def parse_command_line_parameters
@@ -318,35 +332,39 @@ class ParamParser
     case ARGV.size
     when 0                                      
       # no params => current month only
-      start_month = end_month = Time.now.month
-      year = Time.now.year
+      start_month = end_month = Month.new(Time.now.month, Time.now.year)
     when 1
-      # month range for current year: dd-dd, or a year
+      # month range (dd-dd), or a year
       if ARGV[0] =~ RE_MONTH_RANGE_PARAM
-        start_month, end_month = parse_month_param(ARGV[0])
-        year = Time.now.year
+        this_year = Time.now.year
+        first_month, last_month = parse_month_param(ARGV[0])
+        start_month = Month.new(first_month, this_year)
+        if (first_month < last_month)
+          end_month = Month.new(last_month, this_year)
+        else
+          end_month = Month.new(last_month, this_year + 1)
+        end
       else # year
-        start_month = 1
-        end_month = 12
         year = int_from_str(ARGV[0])
+        start_month = Month.new(1, year)
+        end_month = Month.new(12, year)
       end
     when 2
       # two params = month(s), year
-      start_month, end_month = parse_month_param(ARGV[0])
+      first_month, last_month = parse_month_param(ARGV[0])
       year = int_from_str(ARGV[1])
+      start_month = Month.new(first_month, year)
+      end_month = Month.new(last_month, year)
     else
       # too many parameters
       abort USAGE_MSG
     end
 
-    MonthRange.new(start_month, end_month, year, year)
+    [start_month, end_month]
   end
 end
 
-# helper struct to hold a month range 
-MonthRange = Struct.new(:start_month, :end_month, :start_year, :end_year)
-
-
 month_range = ParamParser.new.parse_command_line_parameters
-RbCal.new(month_range).print_calendar
+RbCal.new(*month_range).print_calendar
+
 

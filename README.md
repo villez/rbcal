@@ -26,6 +26,7 @@ in other countries.
     rbcal               # display current month
     rbcal 2015          # display full year, Jan-Dec 2015
 	rbcal 7-10          # display July-October for current year
+	rbcal 10-05         # display Oct this year - May next year
 	rbcal 05 2014       # display May 2014
 	rbcal 10-12 2013    # display Oct-Dec 2013
 
@@ -33,8 +34,8 @@ So the supported parameter combinations are:
 
 * no parameters: display the current month only
 * a single parameter: the year to display in full
-* two numbers separated by a dash: a month range for the current year
-  (first number must be smaller than the second one)
+* two numbers separated by a dash: a month range; if the first month
+  is bigger than the second, wrap over to the next year
 * two numbers separated by a space: month and year
 * two dash-separated numbers + 3rd number: month range and year
 
@@ -81,8 +82,8 @@ simple reminders that certain dates are "noteworthy" in some way.
 Possible enhancements, no concrete implementation plan or schedule at
 the moment: 
 
- * displaying a month range across different years,
-   such as 11-2013 - 03-2014
+ * displaying a month range across arbitrary different years instead
+   of just this year & next year, e.g. 11-2010 - 03-2012
  * options to customize color output or turn it off completely
  * other output formatting options, e.g. specifying the number of
    columns, suppressing week number display, ...
