@@ -9,7 +9,7 @@ Doesn't support all the options in the stock Unix/Linux/OS X versions,
 such as handling Julian calendars, etc. However, has a few
 additional features:
 
- * displaying a month range (currently only within the same year)
+ * displaying an arbitrary month range that may go across different years
  * always show week numbers to the left
  * use ANSI colors to highlight the current date, public holidays,
    and other "notable" dates, like daylight saving time changes
@@ -23,12 +23,13 @@ in other countries.
 
 ## Usage Examples
 
-    rbcal               # display current month
-    rbcal 2015          # display full year, Jan-Dec 2015
-	rbcal 7-10          # display July-October for current year
-	rbcal 10-05         # display Oct this year - May next year
-	rbcal 05 2014       # display May 2014
-	rbcal 10-12 2013    # display Oct-Dec 2013
+    rbcal                  # display current month
+    rbcal 2015             # display full year, Jan-Dec 2015
+	rbcal 7-10             # display July-October for current year
+	rbcal 10-05            # display Oct this year - May next year
+	rbcal 05 2014          # display May 2014
+	rbcal 10-12 2013       # display Oct-Dec 2013
+	rbcal 10 2013 05 2014  # display Oct 2013 - May 2014
 
 So the supported parameter combinations are:
 
@@ -38,6 +39,7 @@ So the supported parameter combinations are:
   is bigger than the second, wrap over to the next year
 * two numbers separated by a space: month and year
 * two dash-separated numbers + 3rd number: month range and year
+* four numbers: month firstyear month lastyear
 
 
 ## Installing
@@ -82,8 +84,6 @@ simple reminders that certain dates are "noteworthy" in some way.
 Possible enhancements, no concrete implementation plan or schedule at
 the moment: 
 
- * displaying a month range across arbitrary different years instead
-   of just this year & next year, e.g. 11-2010 - 03-2012
  * options to customize color output or turn it off completely
  * other output formatting options, e.g. specifying the number of
    columns, suppressing week number display, ...

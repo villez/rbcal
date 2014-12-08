@@ -154,6 +154,8 @@ end
 # from the config file (~/.rbcal), storing common Finnish holidays, and
 # calculating the dates for moving holidays per year according to predefined
 # rules
+# Each instance is *per year*, so when displaying multiple years in a single
+# run, the class must be instantiated separately for each of the years
 class SpecialDates
   
   CONFIG_FILE = File.join(ENV["HOME"], ".rbcal")
@@ -355,6 +357,14 @@ class ParamParser
       year = int_from_str(ARGV[1])
       start_month = Month.new(first_month, year)
       end_month = Month.new(last_month, year)
+    when 4
+      # 4 params = first month, first year, last month, last year
+      first_month = parse_month_param(ARGV[0]).first
+      first_year = int_from_str(ARGV[1])
+      last_month = parse_month_param(ARGV[2]).first
+      last_year = int_from_str(ARGV[3])
+      start_month = Month.new(first_month, first_year)
+      end_month = Month.new(last_month, last_year)
     else
       # too many parameters
       abort USAGE_MSG
