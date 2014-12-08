@@ -30,6 +30,7 @@ in other countries.
 	rbcal 05 2014          # display May 2014
 	rbcal 10-12 2013       # display Oct-Dec 2013
 	rbcal 10 2013 05 2014  # display Oct 2013 - May 2014
+	rbcal 11/2014 10/2015  # display Nov 2014 - Oct 2015
 
 So the supported parameter combinations are:
 
@@ -39,7 +40,8 @@ So the supported parameter combinations are:
   is bigger than the second, wrap over to the next year
 * two numbers separated by a space: month and year
 * two dash-separated numbers + 3rd number: month range and year
-* four numbers: month firstyear month lastyear
+* four numbers: month firstyear month lastyear (also support
+  month/firstyear month/lastyear)
 
 
 ## Installing

@@ -295,35 +295,25 @@ end
 
 # parsing and validity checking the command-line arguments
 class ParamParser
-  USAGE_MSG = "Usage: rbcal [[month | start_month-end_month] year]"
+  USAGE_MSG = <<-EOM
+    Usage:
+    rbcal                  # display current month
+    rbcal 2015             # display full year, Jan-Dec 2015
+    rbcal 7-10             # display July-October for current year
+    rbcal 10-05            # display Oct this year - May next year
+    rbcal 05 2014          # display May 2014
+    rbcal 10-12 2013       # display Oct-Dec 2013
+    rbcal 10 2013 05 2014  # display Oct 2013 - May 2014
+    rbcal 11/2014 10/2015  # display Nov 2014 - Oct 2015
+  EOM
 
-  RE_MONTH_RANGE_PARAM = /\A(?<start_month_param>\d\d?)-(?<end_month_param>\d\d?)\Z/
-
-  def parse_month_param(param)
-    if RE_MONTH_RANGE_PARAM =~ param
-      start_month = int_from_str(Regexp.last_match(:start_month_param))
-      end_month = int_from_str(Regexp.last_match(:end_month_param))
-    else
-      start_month = end_month = int_from_str(param)
-    end
-    
-    abort USAGE_MSG unless legal_month_range?(start_month, end_month)
-
-    [start_month, end_month]
-  end
-
-
-  def int_from_str(str)
-    Integer(str, 10)    # always use decimal, even for zero-prefix forms like 05
-  rescue ArgumentError  # if str is not numeric => invalid argument, unrecoverable error
-    abort USAGE_MSG
-  end
-
-  def legal_month_range?(start_month, end_month)
-    (1..12).include?(start_month) &&
-      (1..12).include?(end_month) 
-  end
-
+  # regular expressions matching the supported command-line 
+  RE_MONTH_RANGE = /\A(?<first_month>\d\d?)-(?<second_month>\d\d?)\Z/
+  RE_SINGLE_YEAR = /\A(?<year>\d{1,})\Z/
+  RE_MONTH_AND_YEAR = /\A(?<month>\d\d?)\s(?<year>\d{1,})\Z/
+  RE_MONTH_RANGE_AND_YEAR = /\A(?<first_month>\d\d?)\-(?<second_month>\d\d?)\s(?<year>\d{1,})\Z/
+  RE_TWO_MONTHS_TWO_YEARS = /\A(?<first_month>\d\d?)[\s\/](?<first_year>\d{1,})\s(?<second_month>\d\d?)[\s\/](?<second_year>\d{1,})\Z/
+  
   def parse_command_line_parameters
     # this is actually redundant, as any non-numeric params
     # will fail the later checks for valid month/date parameters,
@@ -331,50 +321,56 @@ class ParamParser
     # have this explicit 
     abort USAGE_MSG if ARGV[0] == "-h" || ARGV[0] == "--help"
 
-    case ARGV.size
-    when 0                                      
-      # no params => current month only
+    case ARGV.join(' ')
+    when /\A\s*\Z/
       start_month = end_month = Month.new(Time.now.month, Time.now.year)
-    when 1
-      # month range (dd-dd), or a year
-      if ARGV[0] =~ RE_MONTH_RANGE_PARAM
-        this_year = Time.now.year
-        first_month, last_month = parse_month_param(ARGV[0])
-        start_month = Month.new(first_month, this_year)
-        if (first_month < last_month)
-          end_month = Month.new(last_month, this_year)
-        else
-          end_month = Month.new(last_month, this_year + 1)
-        end
-      else # year
-        year = int_from_str(ARGV[0])
-        start_month = Month.new(1, year)
-        end_month = Month.new(12, year)
+    when RE_SINGLE_YEAR
+      start_month = Month.new(1, Regexp.last_match(:year).to_i)
+      end_month = Month.new(12, Regexp.last_match(:year).to_i)
+    when RE_MONTH_RANGE
+      first_month = Regexp.last_match(:first_month).to_i
+      second_month = Regexp.last_match(:second_month).to_i
+      start_month = Month.new(first_month, Time.now.year)
+      if first_month < second_month
+        end_month = Month.new(second_month, Time.now.year)
+      else
+        end_month = Month.new(second_month, Time.now.year + 1)
       end
-    when 2
-      # two params = month(s), year
-      first_month, last_month = parse_month_param(ARGV[0])
-      year = int_from_str(ARGV[1])
+    when RE_MONTH_AND_YEAR
+      month = Regexp.last_match(:month).to_i
+      year = Regexp.last_match(:year).to_i
+      start_month = end_month = Month.new(month, year)
+    when RE_MONTH_RANGE_AND_YEAR
+      first_month = Regexp.last_match(:first_month).to_i
+      second_month = Regexp.last_match(:second_month).to_i
+      year = Regexp.last_match(:year).to_i
       start_month = Month.new(first_month, year)
-      end_month = Month.new(last_month, year)
-    when 4
-      # 4 params = first month, first year, last month, last year
-      first_month = parse_month_param(ARGV[0]).first
-      first_year = int_from_str(ARGV[1])
-      last_month = parse_month_param(ARGV[2]).first
-      last_year = int_from_str(ARGV[3])
+      end_month = Month.new(second_month, year)
+    when RE_TWO_MONTHS_TWO_YEARS
+      first_month = Regexp.last_match(:first_month).to_i
+      second_month = Regexp.last_match(:second_month).to_i
+      first_year = Regexp.last_match(:first_year).to_i
+      second_year = Regexp.last_match(:second_year).to_i
       start_month = Month.new(first_month, first_year)
-      end_month = Month.new(last_month, last_year)
+      end_month = Month.new(second_month, second_year)
     else
-      # too many parameters
       abort USAGE_MSG
     end
+    
+    abort USAGE_MSG unless legal_month_range?(start_month, end_month)
 
-    [start_month, end_month]
+    [ start_month, end_month ]
+  end
+
+  def legal_month_range?(start_month, end_month)
+    (1..12).include?(start_month.month) && 
+      (1..12).include?(end_month.month) &&
+      start_month.year <= end_month.year &&
+      (start_month.month <= end_month.month || start_month.year < end_month.year)
   end
 end
 
 month_range = ParamParser.new.parse_command_line_parameters
-RbCal.new(*month_range).print_calendar
+RbCal.new(month_range.first, month_range.last).print_calendar
 
 
