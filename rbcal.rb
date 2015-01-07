@@ -16,7 +16,6 @@ Month = Struct.new(:month, :year)
 # the starting & ending month and year parameters; utilizes the
 # SpecialDates class for detecting dates to highlight 
 class RbCal
-
   # print formatting constants; not really meant to be customized;
   # depending on terminal window size, 2 or 4 columns might be useful/usable as well
   WEEK_ROW_LEN = 25
@@ -29,16 +28,17 @@ class RbCal
     @month_range = []
     @special_dates = {}
     @special_dates[start_month.year] = SpecialDates.new(start_month.year)
+    
     m = start_month.month
     y = start_month.year
     while y < end_month.year || (y == end_month.year &&  m <= end_month.month)
       @month_range << Month.new(m, y)
-      unless m == 12
-        m = m + 1
-      else
+      if m == 12
         m = 1
-        y = y + 1
+        y += 1
         @special_dates[y] = SpecialDates.new(y)
+      else
+        m += 1
       end
     end
   end
@@ -121,7 +121,7 @@ class RbCal
   def day_display(date)
     formatted_day = "%02d " % date.day
     if date == Time.now.to_date
-       formatted_day = format_today(formatted_day)
+      formatted_day = format_today(formatted_day)
     elsif @special_dates[date.year].holiday?(date)
       formatted_day = format_holiday(formatted_day)
     elsif @special_dates[date.year].personal_hilight?(date)
@@ -157,7 +157,6 @@ end
 # Each instance is *per year*, so when displaying multiple years in a single
 # run, the class must be instantiated separately for each of the years
 class SpecialDates
-  
   CONFIG_FILE = File.join(ENV["HOME"], ".rbcal")
 
   # predefined fixed holidays (same date every year) to highlight
