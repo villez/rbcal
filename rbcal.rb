@@ -5,19 +5,19 @@
 # but with some added (and subtracted) features. See README.md
 # for a full description.
 # 
-# (c) Ville Siltanen 2013-2014
+# (c) Ville Siltanen 2013-2015
 
 require "date"
 
-# helper struct to held a month with year
+# helper struct to hold a month with year
 Month = Struct.new(:month, :year)
 
-# The class that takes care of printing the calendar based on
+# This class takes care of printing the calendar based on
 # the starting & ending month and year parameters; utilizes the
 # SpecialDates class for detecting dates to highlight 
 class RbCal
-  # print formatting constants; not really meant to be customized;
-  # depending on terminal window size, 2 or 4 columns might be useful/usable as well
+  # print formatting constants; not really meant to be customized, but
+  # depending on terminal window size, 2 or 4 columns might be usable as well
   WEEK_ROW_LEN = 25
   EMPTY_WEEK_ROW = " " * WEEK_ROW_LEN
   DEFAULT_COLUMN_AMOUNT = 3
