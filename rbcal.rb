@@ -96,21 +96,21 @@ class RbCal
     weeks
   end
 
-  def week_display(month, day)
-    week = week_number_display(day)
+  def week_display(month, starting_day)
+    week = week_number_display(starting_day)
 
-    # insert padding at the beginning if the 1st is not Monday
-    week << EMPTY_DAY * (day.cwday - 1)
+    # insert padding at the beginning if the starting day is not Monday
+    week << EMPTY_DAY * (starting_day.cwday - 1)
 
-    # iterate through the remaining days and produce a display string
-    # for each - possibly empty padding if month ends in the middle of the week
-    0.upto(7 - day.cwday).each do
-      week << (day.month == month.month ? day_display(day) : EMPTY_DAY)
-      day += 1
-    end
-    
+    # produce a display string for the remaining days of the week;
+    # possibly empty padding if month ends in the middle of the week
+    last_day_of_week = starting_day + (7 - starting_day.cwday)
+    week << (starting_day..last_day_of_week).map do
+      |d| (d.month == month.month ? day_display(d) : EMPTY_DAY)
+    end.join
     week << "\n"
-    [week, day] # when month still unfinished, day = 1st day of next week
+    
+    [week, last_day_of_week + 1]
   end
 
   def week_number_display(current_day)
