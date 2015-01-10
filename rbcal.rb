@@ -90,32 +90,34 @@ class RbCal
     weeks = ""
     day = first_day_of_month(month)
     while day.month == month.month
-      week, day = week_display(month, day)
-      weeks << week
+      wk = week_display(month, day)
+      day = wk[:first_of_next_week]
+      weeks << wk[:week_display_string] << "\n"
     end
     weeks
   end
 
-  def week_display(month, starting_day)
-    week = week_number_display(starting_day)
-
-    # insert padding at the beginning if the starting day is not Monday
-    week << EMPTY_DAY * (starting_day.cwday - 1)
-
-    # produce a display string for the remaining days of the week;
-    # possibly empty padding if month ends in the middle of the week
-    last_day_of_week = starting_day + (7 - starting_day.cwday)
-    week << (starting_day..last_day_of_week).reduce("") do |days, day|
-      days << (day.month == month.month ? day_display(day) : EMPTY_DAY)
-    end
-    week << "\n"
+  def week_display(month, start_day)
+    last_day = start_day + (7 - start_day.cwday)
     
-    [week, last_day_of_week + 1]
+    { week_display_string: week_number_display(start_day) + beginning_of_week_padding(start_day) +
+      days_for_week(month, start_day, last_day),
+      first_of_next_week: last_day + 1 }
   end
 
   def week_number_display(current_day)
     colorize_string("%02d  " % current_day.cweek, :green)
-  end  
+  end
+
+  def beginning_of_week_padding(start_day)
+    EMPTY_DAY * (start_day.cwday - 1)
+  end
+
+  def days_for_week(month, start_day, last_day)
+    (start_day..last_day).reduce("") do |days, day|
+      days << (day.month == month.month ? day_display(day) : EMPTY_DAY)
+    end
+  end
 
   def day_display(date)
     formatted_day = "%02d " % date.day
