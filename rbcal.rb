@@ -105,9 +105,9 @@ class RbCal
     # produce a display string for the remaining days of the week;
     # possibly empty padding if month ends in the middle of the week
     last_day_of_week = starting_day + (7 - starting_day.cwday)
-    week << (starting_day..last_day_of_week).map do
-      |d| (d.month == month.month ? day_display(d) : EMPTY_DAY)
-    end.join
+    week << (starting_day..last_day_of_week).reduce("") do |days, day|
+      days << (day.month == month.month ? day_display(day) : EMPTY_DAY)
+    end
     week << "\n"
     
     [week, last_day_of_week + 1]
