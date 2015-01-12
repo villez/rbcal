@@ -110,7 +110,7 @@ class RbCal
   end
 
   def week_number_display(current_day)
-    colorize_string("%02d  " % current_day.cweek, :green)
+    colorize_string(format("%02d  ", current_day.cweek), :green)
   end
 
   def beginning_of_week_padding(start_day)
@@ -124,7 +124,7 @@ class RbCal
   end
 
   def day_display(date)
-    formatted_day = "%02d " % date.day
+    formatted_day = format("%02d ", date.day)
     if date == Time.now.to_date
       formatted_day = format_today(formatted_day)
     elsif @special_dates[date.year].holiday?(date)
