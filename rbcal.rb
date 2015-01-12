@@ -27,6 +27,10 @@ class RbCal
   def initialize(start_month, end_month)
     @month_range = []
     @special_dates = {}
+    initialize_parameters(start_month, end_month)
+  end
+
+  def initialize_parameters(start_month, end_month)
     @special_dates[start_month.year] = SpecialDates.new(start_month.year)
     
     m = start_month.month
