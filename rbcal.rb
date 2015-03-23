@@ -9,18 +9,18 @@
 
 require "date"
 
-# helper struct to hold a month with year
+# helper struct to hold a month and a year (but no day)
 Month = Struct.new(:month, :year)
 
 # This class takes care of printing the calendar based on
 # the starting & ending month and year parameters; utilizes the
 # SpecialDates class for detecting dates to highlight 
 class RbCal
-  # print formatting constants; not really meant to be customized, but
-  # depending on terminal window size, 2 or 4 columns might be usable as well
+  # print formatting constants; not meant to be customized, but
+  # depending on terminal window size, 2 or 4 columns might be usable
   WEEK_ROW_LEN = 25
   EMPTY_WEEK_ROW = " " * WEEK_ROW_LEN
-  DEFAULT_COLUMN_AMOUNT = 3
+  COLUMNS = 3
   EMPTY_DAY = "   "
   MONTH_GUTTER = "  "
 
@@ -47,8 +47,8 @@ class RbCal
     end
   end
 
-  def print_calendar(column_amount = DEFAULT_COLUMN_AMOUNT)
-    @month_range.each_slice(column_amount) do |month_slice|
+  def print_calendar
+    @month_range.each_slice(COLUMNS) do |month_slice|
       print_months_side_by_side(month_slice)
     end
   end
@@ -59,8 +59,8 @@ class RbCal
     combined_month_string = week_line_range.map do |line_idx|
       combined_week_row_for_months(month_grids, line_idx)
     end.join
-    puts combined_month_string
-    puts
+    
+    puts combined_month_string + "\n"
   end
 
   def combined_week_row_for_months(month_grids, index)
