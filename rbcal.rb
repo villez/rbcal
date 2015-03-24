@@ -54,8 +54,13 @@ class RbCal
   end
 
   def print_months_side_by_side(month_slice)
+    # get the grid for each month in an array of array of strings
     month_grids = month_slice.map { |month| month_display_grid(month).split("\n") }
+
+    # calculate the max number of weeks in these months => number of lines
     week_line_range = (0...month_grids.map(&:size).max)
+
+    # merge the week lines from each month to print side by side
     combined_month_string = week_line_range.map do |line_idx|
       combined_week_row_for_months(month_grids, line_idx)
     end.join
