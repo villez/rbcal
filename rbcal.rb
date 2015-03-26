@@ -54,14 +54,14 @@ class RbCal
   end
 
   def print_months_side_by_side(month_slice)
-    # get the grid for each month in an array of array of strings
-    month_grids = month_slice.map { |month| month_display_grid(month).split("\n") }
+    # get the grid for each month into an array of array strings
+    month_grids = month_slice.map { |month| month_display_grid(month) }
 
-    # calculate the max number of weeks in these months => number of lines
-    week_line_range = (0...month_grids.map(&:size).max)
+    # calculate the max number of lines in the months
+    line_count = month_grids.map(&:size).max
 
-    # merge the week lines from each month to print side by side
-    combined_month_string = week_line_range.map do |line_idx|
+    # merge lines from each month to print side by side
+    combined_month_string = (0...line_count).map do |line_idx|
       combined_week_row_for_months(month_grids, line_idx)
     end.join
     
@@ -84,24 +84,24 @@ class RbCal
   end
 
   def month_display_grid(month)
-    month_header(month) + weekday_header + weeks_for_month(month)
+    [month_header(month), weekday_header] + weeks_for_month(month)
   end
 
   def month_header(month)
-    first_day_of_month(month).strftime("%B %Y").center(WEEK_ROW_LEN) + "\n"
+    first_day_of_month(month).strftime("%B %Y").center(WEEK_ROW_LEN)
   end
 
   def weekday_header
-    "Wk  Mo Tu We Th Fr Sa Su \n"
+    "Wk  Mo Tu We Th Fr Sa Su "
   end
 
   def weeks_for_month(month)
-    weeks = ""
+    weeks = []
     day = first_day_of_month(month)
     while day.month == month.month
       wk = week_display(month, day)
       day = wk[:first_of_next_week]
-      weeks << wk[:week_display_string] << "\n"
+      weeks << wk[:week_display_string]
     end
     weeks
   end
