@@ -61,21 +61,20 @@ class RbCal
     line_count = month_grids.map(&:size).max
 
     # merge lines from each month to print side by side
-    combined_month_string = (0...line_count).map do |line_idx|
-      combined_week_row_for_months(month_grids, line_idx)
-    end.join
+    merged_month_grids = (0...line_count).map do |line_idx|
+      merged_line_for_months(month_grids, line_idx)
+    end
     
-    puts combined_month_string + "\n"
+    puts merged_month_grids.join + "\n"
   end
 
-  def combined_week_row_for_months(month_grids, index)
-    week_row = ""
-    
+  def merged_line_for_months(month_grids, index)
+    line = ""
     month_grids.each do |month|
-      week_row << month.fetch(index, EMPTY_WEEK_ROW)
-      week_row << MONTH_GUTTER unless month == month_grids.last
+      line << month.fetch(index, EMPTY_WEEK_ROW)
+      line << MONTH_GUTTER unless month == month_grids.last
     end
-    week_row << "\n"
+    line << "\n"
   end
 
 
