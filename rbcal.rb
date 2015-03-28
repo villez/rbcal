@@ -53,6 +53,7 @@ class RbCal
     end
   end
 
+  # print the grids for the given months side by side in order
   def print_months_side_by_side(month_slice)
     # get the grid for each month into an array of array strings
     month_grids = month_slice.map { |month| month_display_grid(month) }
@@ -68,6 +69,8 @@ class RbCal
     puts merged_month_grids.join + "\n"
   end
 
+  # merge a printable line from the same index in each of the given months
+  # including substituting empty weeks when some months have less weeks than others
   def merged_line_for_months(month_grids, index)
     line = ""
     month_grids.each do |month|
@@ -94,6 +97,7 @@ class RbCal
     "Wk  Mo Tu We Th Fr Sa Su "
   end
 
+  # produce the printable strings for the weeks in the given month
   def weeks_for_month(month)
     weeks = []
     day = first_day_of_month(month)
@@ -105,6 +109,9 @@ class RbCal
     weeks
   end
 
+  # return the data for a week given the month and the starting day, which
+  # for the first week in the month can be any weekday, so empty padding may
+  # be needed at the beginning
   def week_display(month, start_day)
     last_day = start_day + (7 - start_day.cwday)
     
