@@ -312,18 +312,20 @@ end
 class ParamParser
   USAGE_MSG = <<-EOM
     Usage:
-    rbcal                  # display current month
-    rbcal 2015             # display full year, Jan-Dec 2015
-    rbcal 7-10             # display July-October for current year
-    rbcal 10-05            # display Oct this year - May next year
-    rbcal 05 2014          # display May 2014
-    rbcal 10-12 2013       # display Oct-Dec 2013
-    rbcal 10 2013 05 2014  # display Oct 2013 - May 2014
-    rbcal 11/2014 10/2015  # display Nov 2014 - Oct 2015
-    rbcal 09/2014-02/2015  # display Sep 2014 - Feb 2015
+    rbcal                  # current month
+    rbcal +N               # current month and N next months
+    rbcal 2015             # full year, Jan-Dec 2015
+    rbcal 7-10             # July-October for current year
+    rbcal 10-05            # Oct this year - May next year
+    rbcal 05 2014          # May 2014
+    rbcal 10-12 2013       # Oct-Dec 2013
+    rbcal 10 2013 05 2014  # Oct 2013 - May 2014
+    rbcal 11/2014 10/2015  # Nov 2014 - Oct 2015
+    rbcal 09/2014-02/2015  # Sep 2014 - Feb 2015
   EOM
 
-  # regular expressions matching the supported command-line 
+  # regular expressions matching the supported command-line
+  RE_PLUS_MONTH = /\A\+(?<plus_month>\d+)\Z/
   RE_MONTH_RANGE = /\A(?<first_month>\d\d?)-(?<second_month>\d\d?)\Z/
   RE_SINGLE_YEAR = /\A(?<year>\d{1,})\Z/
   RE_MONTH_AND_YEAR = /\A(?<month>\d\d?)\s(?<year>\d{1,})\Z/
@@ -340,6 +342,15 @@ class ParamParser
     case ARGV.join(' ')
     when /\A\s*\Z/
       start_month = end_month = Month.new(Time.now.month, Time.now.year)
+    when RE_PLUS_MONTH
+      start_month = Month.new(Time.now.month, Time.now.year)
+      incremented_month = Time.now.month + Regexp.last_match(:plus_month).to_i
+      year_increment, month = incremented_month.divmod(12)
+      if month == 0
+        month = 12
+        year_increment -= 1
+      end
+      end_month = Month.new(month, Time.now.year + year_increment)
     when RE_SINGLE_YEAR
       start_month = Month.new(1, Regexp.last_match(:year).to_i)
       end_month = Month.new(12, Regexp.last_match(:year).to_i)

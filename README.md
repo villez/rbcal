@@ -23,19 +23,21 @@ in other countries.
 
 ## Usage Examples
 
-    rbcal                  # display current month
-    rbcal 2015             # display full year, Jan-Dec 2015
-	rbcal 7-10             # display July-October for current year
-	rbcal 10-05            # display Oct this year - May next year
-	rbcal 05 2014          # display May 2014
-	rbcal 10-12 2013       # display Oct-Dec 2013
-	rbcal 10 2013 05 2014  # display Oct 2013 - May 2014
-	rbcal 11/2014 10/2015  # display Nov 2014 - Oct 2015
-    rbcal 09/2014-02/2015  # display Sep 2014 - Feb 2015
+    rbcal                  # current month
+    rbcal +N               # current month and N next months
+    rbcal 2015             # full year, Jan-Dec 2015
+    rbcal 7-10             # July-October for current year
+    rbcal 10-05            # Oct this year - May next year
+    rbcal 05 2014          # May 2014
+    rbcal 10-12 2013       # Oct-Dec 2013
+    rbcal 10 2013 05 2014  # Oct 2013 - May 2014
+    rbcal 11/2014 10/2015  # Nov 2014 - Oct 2015
+    rbcal 09/2014-02/2015  # Sep 2014 - Feb 2015
 
 So the supported parameter combinations are:
 
 * no parameters: display the current month only
+* a number preceded by +: display current month and the N following months
 * a single parameter: the year to display in full
 * two numbers separated by a dash: a month range; if the first month
   is bigger than the second, wrap over to the next year
