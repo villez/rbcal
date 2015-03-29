@@ -29,6 +29,7 @@ in other countries.
     rbcal 7-10             # July-October for current year
     rbcal 10-05            # Oct this year - May next year
     rbcal 05 2014          # May 2014
+    rbcal 03/2015          # March 2015
     rbcal 10-12 2013       # Oct-Dec 2013
     rbcal 10 2013 05 2014  # Oct 2013 - May 2014
     rbcal 11/2014 10/2015  # Nov 2014 - Oct 2015
@@ -100,4 +101,4 @@ the moment:
 
 ## Copyright & License
 
-(c) Ville Siltanen 2013-2014; MIT license.
+(c) Ville Siltanen 2013-2015; MIT license.
