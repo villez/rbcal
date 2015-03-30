@@ -345,13 +345,10 @@ class ParamParser
       start_month = end_month = Month.new(Time.now.month, Time.now.year)
     when RE_PLUS_MONTH
       start_month = Month.new(Time.now.month, Time.now.year)
-      incremented_month = Time.now.month + Regexp.last_match(:plus_month).to_i
-      year_increment, month = incremented_month.divmod(12)
-      if month == 0
-        month = 12
-        year_increment -= 1
-      end
-      end_month = Month.new(month, Time.now.year + year_increment)
+
+      # the Date#>> method returns a date n months later
+      end_date = DateTime.now >> Regexp.last_match(:plus_month).to_i
+      end_month = Month.new(end_date.month, end_date.year)
     when RE_SINGLE_YEAR
       start_month = Month.new(1, Regexp.last_match(:year).to_i)
       end_month = Month.new(12, Regexp.last_match(:year).to_i)
