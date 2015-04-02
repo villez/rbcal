@@ -70,6 +70,8 @@ class RbCal
     puts
   end
 
+  # insert empty rows as padding as needed so that all month grids
+  # to be printed have the same number of lines
   def normalize_month_lines(month_grids, line_count)
     month_grids.each do |month|
       (line_count - month.size).times { month << EMPTY_WEEK_ROW }
@@ -82,10 +84,12 @@ class RbCal
     Date.new(month.year, month.month, 1)
   end
 
+  # month grid = month name + weekday names + the actual day grid
   def month_display_grid(month)
     [month_header(month), weekday_header] + weeks_for_month(month)
   end
 
+  # produce the name of the month centered for the header
   def month_header(month)
     first_day_of_month(month).strftime("%B %Y").center(WEEK_ROW_LEN)
   end
