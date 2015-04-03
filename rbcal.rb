@@ -18,9 +18,9 @@ Month = Struct.new(:month, :year)
 class RbCal
   # print formatting constants; not meant to be customized, but
   # depending on terminal window size, 2 or 4 columns might be usable
-  WEEK_ROW_LEN = 25
-  EMPTY_WEEK_ROW = " " * WEEK_ROW_LEN
+  WEEK_ROW_WIDTH = 25
   COLUMNS = 3
+  EMPTY_WEEK_ROW = " " * WEEK_ROW_WIDTH
   EMPTY_DAY = "   "
   MONTH_GUTTER = "  "
 
@@ -91,7 +91,7 @@ class RbCal
 
   # produce the name of the month centered for the header
   def month_header(month)
-    first_day_of_month(month).strftime("%B %Y").center(WEEK_ROW_LEN)
+    first_day_of_month(month).strftime("%B %Y").center(WEEK_ROW_WIDTH)
   end
 
   def weekday_header
