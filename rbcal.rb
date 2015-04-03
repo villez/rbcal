@@ -58,27 +58,17 @@ class RbCal
     # get the grid for each month into an array of array strings
     month_grids = month_slice.map { |month| month_display_grid(month) }
 
-    # calculate the max number of lines in the months and add empty rows
-    # where needed so every grid has the same # of lines
+    # calculate the max number of printable lines and add empty line padding
+    # as needed so every grid has the same number of lines to print
     line_count = month_grids.map(&:size).max
-    month_grids = normalize_month_lines(month_grids, line_count)
+    month_grids = month_grids.map { |month| month + [EMPTY_WEEK_ROW] * (line_count - month.size) }
 
     # combine the different month grids so they can be printed side by side
-    merged_month_grids = month_grids.transpose.map { |x| x.join(MONTH_GUTTER) }
+    merged_month_grids = month_grids.transpose.map { |row| row.join(MONTH_GUTTER) }.join("\n")
     
-    puts merged_month_grids.join("\n")
+    puts merged_month_grids
     puts
   end
-
-  # insert empty rows as padding as needed so that all month grids
-  # to be printed have the same number of lines
-  def normalize_month_lines(month_grids, line_count)
-    month_grids.each do |month|
-      (line_count - month.size).times { month << EMPTY_WEEK_ROW }
-    end
-    month_grids
-  end
-
 
   def first_day_of_month(month)
     Date.new(month.year, month.month, 1)
