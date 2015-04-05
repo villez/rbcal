@@ -60,8 +60,8 @@ class RbCal
 
     # calculate the max number of printable lines and add empty line padding
     # as needed so every grid has the same number of lines to print
-    line_count = month_grids.map(&:size).max
-    month_grids = month_grids.map { |month| month + [EMPTY_WEEK_ROW] * (line_count - month.size) }
+    max_line_count = month_grids.map(&:size).max
+    month_grids = month_grids.map { |month| month + [EMPTY_WEEK_ROW] * (max_line_count - month.size) }
 
     # combine the different month grids so they can be printed side by side
     merged_month_grids = month_grids.transpose.map { |row| row.join(MONTH_GUTTER) }.join("\n")
@@ -93,9 +93,8 @@ class RbCal
     weeks = []
     day = first_day_of_month(month)
     while day.month == month.month
-      wk = week_display(month, day)
-      day = wk[:first_of_next_week]
-      weeks << wk[:week_display_string]
+      weeks << week_display(month, day)
+      day = first_day_of_next_week(day)
     end
     weeks
   end
@@ -104,23 +103,28 @@ class RbCal
   # for the first week in the month can be any weekday, so empty padding may
   # be needed at the beginning
   def week_display(month, start_day)
-    last_day = start_day + (7 - start_day.cwday)
-    
-    { week_display_string: week_number_display(start_day) + beginning_of_week_padding(start_day) +
-      days_for_week(month, start_day, last_day),
-      first_of_next_week: last_day + 1 }
+    week_number_display(start_day) + beginning_of_week_padding(start_day) +
+      days_for_week(month, start_day)
   end
 
-  def week_number_display(current_day)
-    colorize_string(format("%02d  ", current_day.cweek), :green)
+  def last_day_of_week(start_day)
+    start_day + (7 - start_day.cwday)
+  end
+
+  def first_day_of_next_week(day)
+    last_day_of_week(day) + 1
+  end
+
+  def week_number_display(day)
+    colorize_string(format("%02d  ", day.cweek), :green)
   end
 
   def beginning_of_week_padding(start_day)
     EMPTY_DAY * (start_day.cwday - 1)
   end
 
-  def days_for_week(month, start_day, last_day)
-    (start_day..last_day).reduce("") do |days, day|
+  def days_for_week(month, start_day)
+    (start_day..last_day_of_week(start_day)).reduce("") do |days, day|
       days << (day.month == month.month ? day_display(day) : EMPTY_DAY)
     end
   end
