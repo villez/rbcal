@@ -93,7 +93,7 @@ class RbCal
     weeks = []
     day = first_day_of_month(month)
     while day.month == month.month
-      weeks << week_display(month, day)
+      weeks << week_display(day)
       day = first_day_of_next_week(day)
     end
     weeks
@@ -102,9 +102,10 @@ class RbCal
   # return the data for a week given the month and the starting day, which
   # for the first week in the month can be any weekday, so empty padding may
   # be needed at the beginning
-  def week_display(month, start_day)
-    week_number_display(start_day) + beginning_of_week_padding(start_day) +
-      days_for_week(month, start_day)
+  def week_display(start_day)
+    week_number_display(start_day) +
+      beginning_of_week_padding(start_day) +
+      days_for_week(start_day)
   end
 
   def last_day_of_week(start_day)
@@ -123,9 +124,11 @@ class RbCal
     EMPTY_DAY * (start_day.cwday - 1)
   end
 
-  def days_for_week(month, start_day)
+  # collect all the days for a week into a single string; if the month
+  # rolls over during the week, add empty padding for those days
+  def days_for_week(start_day)
     (start_day..last_day_of_week(start_day)).reduce("") do |days, day|
-      days << (day.month == month.month ? day_display(day) : EMPTY_DAY)
+      days << (day.month == start_day.month ? day_display(day) : EMPTY_DAY)
     end
   end
 
