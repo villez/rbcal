@@ -108,10 +108,12 @@ class RbCal
       days_for_week(start_day)
   end
 
+  # helper method to get the last day of the week containing the given day
   def last_day_of_week(start_day)
     start_day + (7 - start_day.cwday)
   end
 
+  # helper method to get the first day of the *next* week given a day
   def first_day_of_next_week(day)
     last_day_of_week(day) + 1
   end
@@ -120,6 +122,8 @@ class RbCal
     colorize_string(format("%02d  ", day.cweek), :green)
   end
 
+  # produce enough empty padding for a week when a month doesn't
+  # start on a Monday
   def beginning_of_week_padding(start_day)
     EMPTY_DAY * (start_day.cwday - 1)
   end
@@ -132,6 +136,8 @@ class RbCal
     end
   end
 
+  # produce the display string for a day; colorize if it's the current date,
+  # a holiday, or a date listed in the configuration file as one to be highlighted
   def day_display(date)
     formatted_day = format("%02d ", date.day)
     if date == Time.now.to_date
