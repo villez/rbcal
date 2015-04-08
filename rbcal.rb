@@ -30,6 +30,9 @@ class RbCal
     initialize_parameters(start_month, end_month)
   end
 
+  # Set the internal parameters based on the given args for
+  # the start & end months for the calendar display. The complexity
+  # comes from handling month ranges spanning multiple years.
   def initialize_parameters(start_month, end_month)
     @special_dates[start_month.year] = SpecialDates.new(start_month.year)
     
@@ -118,6 +121,7 @@ class RbCal
     last_day_of_week(day) + 1
   end
 
+  # produce the displayable version of the week number for a given day
   def week_number_display(day)
     colorize_string(format("%02d  ", day.cweek), :green)
   end
@@ -163,6 +167,7 @@ class RbCal
   end
   
 
+  # returns an ANSI colored version of the given string
   def colorize_string(str, color)
     # not a complete list of colors, but currently only need these 4
     fg_colors = { red: 31, green: 32, yellow: 33, blue: 34 }
@@ -204,6 +209,9 @@ class SpecialDates
     @personal_hilights.include?(date)
   end
 
+  # initialize the holiday data based on both the fixed configuration (for dates
+  # that are always the same every year, like Christmas) and the data that needs to
+  # be calculated separately for each year based on some rules, such as Easter
   def holidays
     holidays = FIXED_HOLIDAYS.map { |day| Date.new(@year, day[1], day[0]) }
     easter_date = easter  # calculate easter location only once, use many times below
