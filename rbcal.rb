@@ -154,6 +154,9 @@ class RbCal
     formatted_day
   end
 
+  # helper methods to produce the highlighted versions of
+  # the day numbers to display; currently ANSI-colored but could
+  # use other techniques as well
   def format_today(str)
     colorize_string(str, :blue)
   end
@@ -227,6 +230,7 @@ class SpecialDates
                ]
   end
 
+  # read and parse dates from the configuration file
   def hilight_days_from_config_file
     hilights = []
 
@@ -344,12 +348,15 @@ class ParamParser
   RE_MONTH_AND_YEAR = /\A(?<month>\d\d?)[\s\/](?<year>\d{1,})\Z/
   RE_MONTH_RANGE_AND_YEAR = /\A(?<first_month>\d\d?)\-(?<second_month>\d\d?)\s(?<year>\d{1,})\Z/
   RE_TWO_MONTHS_TWO_YEARS = /\A(?<first_month>\d\d?)[\s\/](?<first_year>\d{1,})[\s-](?<second_month>\d\d?)[\s\/](?<second_year>\d{1,})\Z/
-  
+
+  # interpreting the command-line parameters to determine the month(s)
+  # and year(s) for the calendar range 
   def parse_command_line_parameters
-    # this is actually redundant, as any non-numeric params
+    
+    # This is actually redundant, as any non-numeric params
     # will fail the later checks for valid month/date parameters,
-    # and the usage message will be printed; still, maybe cleaner to
-    # have this explicit 
+    # but maybe cleanest to have it explicitly listed. If there were
+    # more "standard" type of options, would use OptParse instead.
     abort USAGE_MSG if ARGV[0] == "-h" || ARGV[0] == "--help"
 
     case ARGV.join(' ')
