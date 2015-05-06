@@ -38,7 +38,7 @@ class RbCal
     
     m = start_month.month
     y = start_month.year
-    while y < end_month.year || (y == end_month.year &&  m <= end_month.month)
+    while y < end_month.year || (y == end_month.year && m <= end_month.month)
       @month_range << Month.new(m, y)
       if m == 12
         m = 1
@@ -315,10 +315,10 @@ class SpecialDates
     g = (b - f + 1) / 3
     h = (19 * a + b - d - g + 15) % 30
     i, k = c.divmod(4)
-    l = (32 + 2*e + 2*i - h - k) % 7
-    m = (a + 11*h + 22*l) / 451
-    month = (h + l - 7*m + 114) / 31
-    day = ((h + l - 7*m + 114) % 31) + 1
+    l = (32 + 2 * e + 2 * i - h - k) % 7
+    m = (a + 11 * h + 22 * l) / 451
+    month = (h + l - 7 * m + 114) / 31
+    day = ((h + l - 7 * m + 114) % 31) + 1
 
     Date.new(@year, month, day)
   end
@@ -359,6 +359,9 @@ class ParamParser
     # more "standard" type of options, would use OptParse instead.
     abort USAGE_MSG if ARGV[0] == "-h" || ARGV[0] == "--help"
 
+    # matching the command-line arguments against the regular expressions
+    # defined above; the order shouldn't be significant in this case, but
+    # be careful and check before rearranging!
     case ARGV.join(' ')
     when /\A\s*\Z/
       start_month = end_month = Month.new(Time.now.month, Time.now.year)
@@ -403,7 +406,7 @@ class ParamParser
     
     abort USAGE_MSG unless legal_month_range?(start_month, end_month)
 
-    [ start_month, end_month ]
+    { start: start_month, end: end_month }
   end
 
   def legal_month_range?(start_month, end_month)
@@ -415,6 +418,6 @@ class ParamParser
 end
 
 month_range = ParamParser.new.parse_command_line_parameters
-RbCal.new(month_range.first, month_range.last).print_calendar
+RbCal.new(month_range[:start], month_range[:end]).print_calendar
 
 
