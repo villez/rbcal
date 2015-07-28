@@ -4,7 +4,7 @@
 # A command-line calendar program like cal/ncal in Unixes
 # but with some added (and subtracted) features. See README.md
 # for a full description.
-# 
+#
 # (c) Ville Siltanen 2013-2015
 
 require "date"
@@ -14,7 +14,7 @@ Month = Struct.new(:month, :year)
 
 # This class takes care of printing the calendar based on
 # the starting & ending month and year parameters; utilizes the
-# SpecialDates class for detecting dates to highlight 
+# SpecialDates class for detecting dates to highlight
 class RbCal
   # print formatting constants; not meant to be customized, but
   # depending on terminal window size, 2 or 4 columns might be usable
@@ -35,7 +35,7 @@ class RbCal
   # comes from handling month ranges spanning multiple years.
   def initialize_parameters(start_month, end_month)
     @special_dates[start_month.year] = SpecialDates.new(start_month.year)
-    
+
     m = start_month.month
     y = start_month.year
     while y < end_month.year || (y == end_month.year && m <= end_month.month)
@@ -68,7 +68,7 @@ class RbCal
 
     # combine the different month grids so they can be printed side by side
     merged_month_grids = month_grids.transpose.map { |row| row.join(MONTH_GUTTER) }.join("\n")
-    
+
     puts merged_month_grids
     puts
   end
@@ -168,7 +168,7 @@ class RbCal
   def format_hilight(str)
     colorize_string(str, :yellow)
   end
-  
+
 
   # returns an ANSI colored version of the given string
   def colorize_string(str, color)
@@ -235,7 +235,7 @@ class SpecialDates
     hilights = []
 
     return hilights unless File.exist?(CONFIG_FILE)
-    
+
     File.readlines(CONFIG_FILE).each do |line|
       next if line !~ /^\d{1,2}\s\d{1,2}(\s\d{1,4})?.*$/
       day, month, year = line.split(' ').map(&:to_i)
@@ -243,7 +243,7 @@ class SpecialDates
       date = Date.new(year, month, day) rescue next  # protect from malformed config
       hilights << date
     end
-    
+
     hilights
   end
 
@@ -350,9 +350,9 @@ class ParamParser
   RE_TWO_MONTHS_TWO_YEARS = /\A(?<first_month>\d\d?)[\s\/](?<first_year>\d{1,})[\s-](?<second_month>\d\d?)[\s\/](?<second_year>\d{1,})\Z/
 
   # interpreting the command-line parameters to determine the month(s)
-  # and year(s) for the calendar range 
+  # and year(s) for the calendar range
   def parse_command_line_parameters
-    
+
     # This is actually redundant, as any non-numeric params
     # will fail the later checks for valid month/date parameters,
     # but maybe cleanest to have it explicitly listed. If there were
@@ -403,14 +403,14 @@ class ParamParser
     else
       abort USAGE_MSG
     end
-    
+
     abort USAGE_MSG unless legal_month_range?(start_month, end_month)
 
     { start: start_month, end: end_month }
   end
 
   def legal_month_range?(start_month, end_month)
-    (1..12).include?(start_month.month) && 
+    (1..12).include?(start_month.month) &&
       (1..12).include?(end_month.month) &&
       start_month.year <= end_month.year &&
       (start_month.month <= end_month.month || start_month.year < end_month.year)
@@ -419,5 +419,3 @@ end
 
 month_range = ParamParser.new.parse_command_line_parameters
 RbCal.new(month_range[:start], month_range[:end]).print_calendar
-
-
