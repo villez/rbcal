@@ -31,6 +31,7 @@ in other countries.
     rbcal 05 2014          # May 2014
     rbcal 03/2015          # March 2015
     rbcal 10-12 2013       # Oct-Dec 2013
+    rbcal 03-04/2016       # Mar-Apr 2016
     rbcal 10 2013 05 2014  # Oct 2013 - May 2014
     rbcal 11/2014 10/2015  # Nov 2014 - Oct 2015
     rbcal 09/2014-02/2015  # Sep 2014 - Feb 2015
@@ -101,4 +102,4 @@ the moment:
 
 ## Copyright & License
 
-(c) Ville Siltanen 2013-2015; MIT license.
+(c) Ville Siltanen 2013-2016; MIT license.

@@ -5,7 +5,7 @@
 # but with some added (and subtracted) features. See README.md
 # for a full description.
 #
-# (c) Ville Siltanen 2013-2015
+# (c) Ville Siltanen 2013-2016
 
 require "date"
 
@@ -336,6 +336,7 @@ class ParamParser
     rbcal 05 2014          # May 2014
     rbcal 03/2015          # March 2015
     rbcal 10-12 2013       # Oct-Dec 2013
+    rbcal 03-04/2016       # Mar-Apr 2016
     rbcal 10 2013 05 2014  # Oct 2013 - May 2014
     rbcal 11/2014 10/2015  # Nov 2014 - Oct 2015
     rbcal 09/2014-02/2015  # Sep 2014 - Feb 2015
@@ -346,7 +347,7 @@ class ParamParser
   RE_MONTH_RANGE = /\A(?<first_month>\d\d?)-(?<second_month>\d\d?)\Z/
   RE_SINGLE_YEAR = /\A(?<year>\d{1,})\Z/
   RE_MONTH_AND_YEAR = /\A(?<month>\d\d?)[\s\/](?<year>\d{1,})\Z/
-  RE_MONTH_RANGE_AND_YEAR = /\A(?<first_month>\d\d?)\-(?<second_month>\d\d?)\s(?<year>\d{1,})\Z/
+  RE_MONTH_RANGE_AND_YEAR = /\A(?<first_month>\d\d?)\-(?<second_month>\d\d?)[\s\/](?<year>\d{1,})\Z/
   RE_TWO_MONTHS_TWO_YEARS = /\A(?<first_month>\d\d?)[\s\/](?<first_year>\d{1,})[\s-](?<second_month>\d\d?)[\s\/](?<second_year>\d{1,})\Z/
 
   # interpreting the command-line parameters to determine the month(s)
