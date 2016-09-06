@@ -9,9 +9,6 @@
 
 require "date"
 
-# helper struct to hold a month and a year (but no day)
-Month = Struct.new(:month, :year)
-
 # This class takes care of printing the calendar based on
 # the starting & ending month and year parameters; utilizes the
 # SpecialDates class for detecting dates to highlight
@@ -39,7 +36,7 @@ class RbCal
     m = start_month.month
     y = start_month.year
     while y < end_month.year || (y == end_month.year && m <= end_month.month)
-      @month_range << Month.new(m, y)
+      @month_range << DateTime.new(y, m)
       if m == 12
         m = 1
         y += 1
@@ -365,42 +362,42 @@ class ParamParser
     # be careful and check before rearranging!
     case ARGV.join(' ')
     when /\A\s*\Z/
-      start_month = end_month = Month.new(Time.now.month, Time.now.year)
+      puts "here"
+      start_month = end_month = DateTime.now
     when RE_PLUS_MONTH
-      start_month = Month.new(Time.now.month, Time.now.year)
+      start_month = DateTime.now
 
-      # the Date#>> method returns a date n months later
-      end_date = DateTime.now >> Regexp.last_match(:plus_month).to_i
-      end_month = Month.new(end_date.month, end_date.year)
+      # the DateTime#>> method returns a date n months later
+      end_month = start_month >> Regexp.last_match(:plus_month).to_i
     when RE_SINGLE_YEAR
-      start_month = Month.new(1, Regexp.last_match(:year).to_i)
-      end_month = Month.new(12, Regexp.last_match(:year).to_i)
+      start_month = DateTime.new(Regexp.last_match(:year).to_i, 1)
+      end_month = DateTime.new(Regexp.last_match(:year).to_i, 12)
     when RE_MONTH_RANGE
       first_month = Regexp.last_match(:first_month).to_i
       second_month = Regexp.last_match(:second_month).to_i
-      start_month = Month.new(first_month, Time.now.year)
+      start_month = DateTime.new(Time.now.year, first_month)
       if first_month < second_month
-        end_month = Month.new(second_month, Time.now.year)
+        end_month = DateTime.new(Time.now.year, second_month)
       else
-        end_month = Month.new(second_month, Time.now.year + 1)
+        end_month = DateTime.new(Time.now.year + 1, second_month)
       end
     when RE_MONTH_AND_YEAR
       month = Regexp.last_match(:month).to_i
       year = Regexp.last_match(:year).to_i
-      start_month = end_month = Month.new(month, year)
+      start_month = end_month = DateTime.new(year, month)
     when RE_MONTH_RANGE_AND_YEAR
       first_month = Regexp.last_match(:first_month).to_i
       second_month = Regexp.last_match(:second_month).to_i
       year = Regexp.last_match(:year).to_i
-      start_month = Month.new(first_month, year)
-      end_month = Month.new(second_month, year)
+      start_month = DateTime.new(year, first_month)
+      end_month = DateTime.new(year, second_month)
     when RE_TWO_MONTHS_TWO_YEARS
       first_month = Regexp.last_match(:first_month).to_i
       second_month = Regexp.last_match(:second_month).to_i
       first_year = Regexp.last_match(:first_year).to_i
       second_year = Regexp.last_match(:second_year).to_i
-      start_month = Month.new(first_month, first_year)
-      end_month = Month.new(second_month, second_year)
+      start_month = DateTime.new(first_year, first_month)
+      end_month = DateTime.new(second_year, second_month)
     else
       abort USAGE_MSG
     end
