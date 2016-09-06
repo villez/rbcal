@@ -415,5 +415,11 @@ class ParamParser
   end
 end
 
-month_range = ParamParser.new.parse_command_line_parameters
-RbCal.new(month_range[:start], month_range[:end]).print_calendar
+
+# only run if invoked as a script - allows requiring the file for testing
+# without it triggering the output
+
+if __FILE__ == $PROGRAM_NAME
+  month_range = ParamParser.new.parse_command_line_parameters
+  RbCal.new(month_range[:start], month_range[:end]).print_calendar
+end
