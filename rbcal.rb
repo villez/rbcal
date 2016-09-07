@@ -362,7 +362,6 @@ class ParamParser
     # be careful and check before rearranging!
     case arguments.join(' ')
     when /\A\s*\Z/
-      puts "here"
       start_month = end_month = Date.today
     when RE_PLUS_MONTH
       start_month = Date.today
