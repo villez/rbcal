@@ -349,18 +349,18 @@ class ParamParser
 
   # interpreting the command-line parameters to determine the month(s)
   # and year(s) for the calendar range
-  def parse_command_line_parameters
+  def parse_command_line_parameters(arguments)
 
     # This is actually redundant, as any non-numeric params
     # will fail the later checks for valid month/date parameters,
     # but maybe cleanest to have it explicitly listed. If there were
     # more "standard" type of options, would use OptParse instead.
-    abort USAGE_MSG if ARGV[0] == "-h" || ARGV[0] == "--help"
+    abort USAGE_MSG if arguments[0] == "-h" || arguments[0] == "--help"
 
     # matching the command-line arguments against the regular expressions
     # defined above; the order shouldn't be significant in this case, but
     # be careful and check before rearranging!
-    case ARGV.join(' ')
+    case arguments.join(' ')
     when /\A\s*\Z/
       puts "here"
       start_month = end_month = Date.today
@@ -420,6 +420,6 @@ end
 # without it triggering the output
 
 if __FILE__ == $PROGRAM_NAME
-  month_range = ParamParser.new.parse_command_line_parameters
+  month_range = ParamParser.new.parse_command_line_parameters(ARGV)
   RbCal.new(month_range[:start], month_range[:end]).print_calendar
 end
