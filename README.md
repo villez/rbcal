@@ -1,4 +1,4 @@
-# rbcal
+# vscal
 
 A command line calendar viewer written in Ruby, doing the same basic
 task as the Unix cal/ncal utilities.
@@ -14,7 +14,7 @@ additional features:
  * use ANSI colors to highlight the current date, public holidays,
    and other "notable" dates, like daylight saving time changes
  * support for configuring your own list of dates to highlight via a
-   configuration file (~/.rbcal)
+   configuration file (~/.vscal)
 
 The public holidays etc. are currently only shown based on the rules
 for the *Finnish* calendar; there are going to be some differences
@@ -23,18 +23,18 @@ in other countries.
 
 ## Usage Examples
 
-    rbcal                  # current month
-    rbcal +N               # current month and N next months
-    rbcal 2015             # full year, Jan-Dec 2015
-    rbcal 7-10             # July-October for current year
-    rbcal 10-05            # Oct this year - May next year
-    rbcal 05 2014          # May 2014
-    rbcal 03/2015          # March 2015
-    rbcal 10-12 2013       # Oct-Dec 2013
-    rbcal 03-04/2016       # Mar-Apr 2016
-    rbcal 10 2013 05 2014  # Oct 2013 - May 2014
-    rbcal 11/2014 10/2015  # Nov 2014 - Oct 2015
-    rbcal 09/2014-02/2015  # Sep 2014 - Feb 2015
+    vscal                  # current month
+    vscal +N               # current month and N next months
+    vscal 2015             # full year, Jan-Dec 2015
+    vscal 7-10             # July-October for current year
+    vscal 10-05            # Oct this year - May next year
+    vscal 05 2014          # May 2014
+    vscal 03/2015          # March 2015
+    vscal 10-12 2013       # Oct-Dec 2013
+    vscal 03-04/2016       # Mar-Apr 2016
+    vscal 10 2013 05 2014  # Oct 2013 - May 2014
+    vscal 11/2014 10/2015  # Nov 2014 - Oct 2015
+    vscal 09/2014-02/2015  # Sep 2014 - Feb 2015
 
 So the supported parameter combinations are:
 
@@ -58,18 +58,18 @@ available in 1.8.7, which has been end-of-lifed anyway.
 
 There is a simple shell script to install the program for use,
 `install`. However it's very basic and just copies the main script
-into `~/bin/rbcal` and the example configuration file into `~/.rbcal`.
+into `~/bin/vscal` and the example configuration file into `~/.vscal`.
 
 The install script isn't extremely robust, but it does check that the
 `~/bin` directory exists and doesn't overwrite a previous
-configuration file (`~/.rbcal`). You can also easily do the same thing
+configuration file (`~/.vscal`). You can also easily do the same thing
 manually and choose where to put the script, what to name it, whether
 to include the config file or not, etc.
 
 
 ## The Configuration File
 
-The `~/.rbcal` configuration file is a simple text file that lists
+The `~/.vscal` configuration file is a simple text file that lists
 dates that should be highlighted in the calendar display. It's
 optional, so if you don't wish to configure custom highlight dates
 with it, you can safely ignore it or even remove it.

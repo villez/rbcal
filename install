@@ -1,13 +1,13 @@
 #!/bin/sh
 # installing the calendar script as an executable script
-# under ~/bin and the configuration file as ~/.rbcal
+# under ~/bin and the configuration file as ~/.vscal
 
 if [ -d "$HOME/bin" ]; then
 
-    echo "installing binary as ~/bin/rbcal"
-    
-    cp ./rbcal.rb ~/bin/rbcal
-    chmod a+x ~/bin/rbcal
+    echo "installing binary as ~/bin/vscal"
+
+    cp ./rbcal.rb ~/bin/vscal
+    chmod a+x ~/bin/vscal
 else
     echo "The directory ~/bin doesn't exist; either create it and rerun install"
     echo "or copy the file rbcal.rb manually to a location in your path with a"
@@ -15,10 +15,10 @@ else
     exit
 fi
 
-if [ -f "$HOME/.rbcal" ]; then
-    echo "~/.rbcal exists already, not overwriting"
+if [ -f "$HOME/.vscal" ]; then
+    echo "~/.vscal exists already, not overwriting"
     exit
 else
-    echo "installing an example config file as ~/.rbcal"
-    cp ./.rbcal-example ~/.rbcal
+    echo "installing an example config file as ~/.vscal"
+    cp ./.vscal-example ~/.vscal
 fi

@@ -12,7 +12,7 @@ require "date"
 # This class takes care of printing the calendar based on
 # the starting & ending month and year parameters; utilizes the
 # SpecialDates class for detecting dates to highlight
-class RbCal
+class VsCal
   # print formatting constants; not meant to be customized, but
   # depending on terminal window size, 2 or 4 columns might be usable
   WEEK_ROW_WIDTH = 25
@@ -176,13 +176,13 @@ class RbCal
 end
 
 # a utility class for handling dates to be highlighted, including reading
-# from the config file (~/.rbcal), storing common Finnish holidays, and
+# from the config file (~/.vscal), storing common Finnish holidays, and
 # calculating the dates for moving holidays per year according to predefined
 # rules
 # Each instance is *per year*, so when displaying multiple years in a single
 # run, the class must be instantiated separately for each of the years
 class SpecialDates
-  CONFIG_FILE = File.join(ENV["HOME"], ".rbcal")
+  CONFIG_FILE = File.join(ENV["HOME"], ".vscal")
 
   # predefined fixed holidays (same date every year) to highlight
   # the format is [day, month]
@@ -325,18 +325,18 @@ end
 class ParamParser
   USAGE_MSG = <<-EOM
     Usage:
-    rbcal                  # current month
-    rbcal +N               # current month and N next months
-    rbcal 2015             # full year, Jan-Dec 2015
-    rbcal 7-10             # July-October for current year
-    rbcal 10-05            # Oct this year - May next year
-    rbcal 05 2014          # May 2014
-    rbcal 03/2015          # March 2015
-    rbcal 10-12 2013       # Oct-Dec 2013
-    rbcal 03-04/2016       # Mar-Apr 2016
-    rbcal 10 2013 05 2014  # Oct 2013 - May 2014
-    rbcal 11/2014 10/2015  # Nov 2014 - Oct 2015
-    rbcal 09/2014-02/2015  # Sep 2014 - Feb 2015
+    vscal                  # current month
+    vscal +N               # current month and N next months
+    vscal 2015             # full year, Jan-Dec 2015
+    vscal 7-10             # July-October for current year
+    vscal 10-05            # Oct this year - May next year
+    vscal 05 2014          # May 2014
+    vscal 03/2015          # March 2015
+    vscal 10-12 2013       # Oct-Dec 2013
+    vscal 03-04/2016       # Mar-Apr 2016
+    vscal 10 2013 05 2014  # Oct 2013 - May 2014
+    vscal 11/2014 10/2015  # Nov 2014 - Oct 2015
+    vscal 09/2014-02/2015  # Sep 2014 - Feb 2015
   EOM
 
   # regular expressions matching the supported command-line
@@ -420,5 +420,5 @@ end
 
 if __FILE__ == $PROGRAM_NAME
   month_range = ParamParser.new.parse_command_line_parameters(ARGV)
-  RbCal.new(month_range[:start], month_range[:end]).print_calendar
+  VsCal.new(month_range[:start], month_range[:end]).print_calendar
 end
