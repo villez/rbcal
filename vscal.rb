@@ -21,9 +21,10 @@ class VsCal
   EMPTY_DAY = "   "
   MONTH_GUTTER = "  "
 
-  def initialize(start_month, end_month)
+  def initialize(start_month, end_month, read_config=true)
     @month_range = []
     @special_dates = {}
+    @read_config = read_config
     initialize_parameters(start_month, end_month)
   end
 
@@ -31,7 +32,7 @@ class VsCal
   # the start & end months for the calendar display. The complexity
   # comes from handling month ranges spanning multiple years.
   def initialize_parameters(start_month, end_month)
-    @special_dates[start_month.year] = SpecialDates.new(start_month.year)
+    @special_dates[start_month.year] = SpecialDates.new(start_month.year, @read_config)
 
     m = start_month.month
     y = start_month.year
@@ -40,7 +41,7 @@ class VsCal
       if m == 12
         m = 1
         y += 1
-        @special_dates[y] = SpecialDates.new(y)
+        @special_dates[y] = SpecialDates.new(y, @read_config)
       else
         m += 1
       end
@@ -195,10 +196,11 @@ class SpecialDates
                     [25, 12],
                     [26, 12]]
 
-  def initialize(year)
+  def initialize(year, read_config=true)
     @year = year
     @holidays = holidays
-    @personal_hilights = hilight_days_from_config_file + common_finnish_hilight_days
+    @personal_hilights = common_finnish_hilight_days
+    @personal_hilights += hilight_days_from_config_file if read_config
   end
 
   def holiday?(date)
