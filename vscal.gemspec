@@ -1,6 +1,8 @@
+require "./lib/vscal/version"
+
 Gem::Specification.new do |s|
   s.name        = "vscal"
-  s.version     = "0.0.1"
+  s.version     = VsCal::VERSION
   s.date        = "2017-01-19"
   s.summary     = "A command line calendar printer"
   s.description = <<-EOF
@@ -9,7 +11,7 @@ Gem::Specification.new do |s|
                   EOF
   s.authors     = ["Ville Siltanen"]
   s.email       = "ville.siltanen@iki.fi"
-  s.files       = ["lib/vscal.rb"]
+  s.files       = Dir.glob("lib/**/*.rb")
   s.executables << "vscal"
   s.license     = "MIT"
 end
