@@ -56,15 +56,12 @@ Ruby 2.x recommended; may work with 1.9.x but no longer tested. Does
 `Date` stdlib class heavily, and some of the features used aren't
 available in 1.8.7, which has been end-of-lifed anyway.
 
-There is a simple shell script to install the program for use,
-`install`. However it's very basic and just copies the main script
-into `~/bin/vscal` and the example configuration file into `~/.vscal`.
-
-The install script isn't extremely robust, but it does check that the
-`~/bin` directory exists and doesn't overwrite a previous
-configuration file (`~/.vscal`). You can also easily do the same thing
-manually and choose where to put the script, what to name it, whether
-to include the config file or not, etc.
+Currently moving to a Ruby gem format is a work in progress. You
+*should* be able to install the program by cloning this repository,
+building them gem with `gem build vscal.gemspec` and then `gem
+install`ing the resulting vscal-<version>.gem file, but as the
+conversion from a standalone script into a Gem is a new development,
+there may be some hiccups.
 
 
 ## The Configuration File
@@ -74,16 +71,23 @@ dates that should be highlighted in the calendar display. It's
 optional, so if you don't wish to configure custom highlight dates
 with it, you can safely ignore it or even remove it.
 
-The dates are listed each on their own row with the format `day month
-[year]`, meaning that the year is optional, and if it's not provided,
-the date is highlighted for all years. If the year is provided, the
-date is highlighted only for that specific year.
+Since Ruby gems don't allow "post-install" scripts without
+workarounds, the example configuration file is nowadays not
+automatically copied into the home directory. There may be a solution
+to this later, but for now, either copy the example file by hand to
+`~/.vscal` or just create it from scratch. 
+
+In the configuration file, dates are listed each on their own row with
+the format `day month [year]`, meaning that the year is optional, and
+if it's not provided, the date is highlighted for all years. If the
+year is provided, the date is highlighted only for that specific year.
 
 There isn't any kind of annotation for the dates, because in the
 calendar display there's no room for showing any additional
 information. Also, this feature isn't really meant to be a replacement
 for a full-blown calendar app with appointments, alerts etc., just
-simple reminders that certain dates are "noteworthy" in some way.
+simple reminders that certain dates are "noteworthy". It's of course
+up to you to decide if and how to use this.
 
 
 ## Future Development Items
