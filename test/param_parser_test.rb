@@ -1,23 +1,23 @@
 require "minitest/autorun"
-require "./rbcal"
+require "vscal"
 
 # These tests verify that the command-line parser identifies the parameter combinations
 # correctly. The actual calendar printing functionality is not included in these tests,
 # but tested separately.
 #
 # The supported formats are:
-#    rbcal                  # current month
-#    rbcal +N               # current month and N next months
-#    rbcal 2015             # full year, Jan-Dec 2015
-#    rbcal 7-10             # July-October for current year
-#    rbcal 10-05            # Oct this year - May next year
-#    rbcal 05 2014          # May 2014
-#    rbcal 03/2015          # March 2015
-#    rbcal 10-12 2013       # Oct-Dec 2013
-#    rbcal 03-04/2016       # Mar-Apr 2016
-#    rbcal 10 2013 05 2014  # Oct 2013 - May 2014
-#    rbcal 11/2014 10/2015  # Nov 2014 - Oct 2015
-#    rbcal 09/2014-02/2015  # Sep 2014 - Feb 2015
+#    vscal                  # current month
+#    vscal +N               # current month and N next months
+#    vscal 2015             # full year, Jan-Dec 2015
+#    vscal 7-10             # July-October for current year
+#    vscal 10-05            # Oct this year - May next year
+#    vscal 05 2014          # May 2014
+#    vscal 03/2015          # March 2015
+#    vscal 10-12 2013       # Oct-Dec 2013
+#    vscal 03-04/2016       # Mar-Apr 2016
+#    vscal 10 2013 05 2014  # Oct 2013 - May 2014
+#    vscal 11/2014 10/2015  # Nov 2014 - Oct 2015
+#    vscal 09/2014-02/2015  # Sep 2014 - Feb 2015
 #
 # The ParamParser#parse_command_line_parameters method takes an ARGV-like array
 # which is essentially the command line parameter string split on whitespace
@@ -39,7 +39,7 @@ class ParamParserTest < Minitest::Test
     assert_equal(@this_month, month_range[:end].month)
   end
 
-  # rbcal +N  => current month and N next months
+  # vscal +N  => current month and N next months
   def test_plus_month
     plus = 7
     month_range = ParamParser.new.parse_command_line_parameters(["+#{plus}"])
@@ -61,7 +61,7 @@ class ParamParserTest < Minitest::Test
 
   end
 
-  # rbcal 2015  => full year, Jan-Dec 2015
+  # vscal 2015  => full year, Jan-Dec 2015
   def test_full_year
     month_range = ParamParser.new.parse_command_line_parameters(["2015"])
 
@@ -71,7 +71,7 @@ class ParamParserTest < Minitest::Test
     assert_equal(12, month_range[:end].month)
   end
 
-  # rbcal 7-10  => July-October for current year
+  # vscal 7-10  => July-October for current year
   def test_month_range_current_year
     month_range = ParamParser.new.parse_command_line_parameters(["7-10"])
 
@@ -81,7 +81,7 @@ class ParamParserTest < Minitest::Test
     assert_equal(10, month_range[:end].month)
   end
 
-  # rbcal 10-05  => Oct this year - May next year
+  # vscal 10-05  => Oct this year - May next year
   def test_month_range_cross_year
     month_range = ParamParser.new.parse_command_line_parameters(["10-5"])
 
@@ -91,7 +91,7 @@ class ParamParserTest < Minitest::Test
     assert_equal(5, month_range[:end].month)
   end
 
-  # rbcal 05 2014  => May 2014
+  # vscal 05 2014  => May 2014
   def test_single_month_with_year_space
     month_range = ParamParser.new.parse_command_line_parameters(["05", "2014"])
 
@@ -101,7 +101,7 @@ class ParamParserTest < Minitest::Test
     assert_equal(5, month_range[:end].month)
   end
 
-  # rbcal 03/2015  => March 2015
+  # vscal 03/2015  => March 2015
   def test_single_month_with_year_slash
     month_range = ParamParser.new.parse_command_line_parameters(["03/2015"])
 
@@ -112,7 +112,7 @@ class ParamParserTest < Minitest::Test
   end
 
 
-  # rbcal 10-12 2013  => Oct-Dec 2013
+  # vscal 10-12 2013  => Oct-Dec 2013
   def test_month_range_with_year_space
     month_range = ParamParser.new.parse_command_line_parameters(["10-12", "2013"])
 
@@ -122,7 +122,7 @@ class ParamParserTest < Minitest::Test
     assert_equal(12, month_range[:end].month)
   end
 
-  # rbcal 03-04/2016  => Mar-Apr 2016
+  # vscal 03-04/2016  => Mar-Apr 2016
   def test_month_range_with_year_slash
     month_range = ParamParser.new.parse_command_line_parameters(["03-04/2016"])
 
@@ -132,7 +132,7 @@ class ParamParserTest < Minitest::Test
     assert_equal(4, month_range[:end].month)
   end
 
-  # rbcal 10 2013 05 2014  => Oct 2013 - May 2014
+  # vscal 10 2013 05 2014  => Oct 2013 - May 2014
   def test_month_range_with_years_spaces
     month_range = ParamParser.new.parse_command_line_parameters(["10", "2013", "05", "2014"])
 
@@ -142,7 +142,7 @@ class ParamParserTest < Minitest::Test
     assert_equal(5, month_range[:end].month)
   end
 
-  # rbcal 11/2014 10/2015  => Nov 2014 - Oct 2015
+  # vscal 11/2014 10/2015  => Nov 2014 - Oct 2015
   def test_month_range_with_years_slash_space
     month_range = ParamParser.new.parse_command_line_parameters(["11/2014", "10/2015"])
 
@@ -152,7 +152,7 @@ class ParamParserTest < Minitest::Test
     assert_equal(10, month_range[:end].month)
   end
 
-  # rbcal 09/2014-02/2015  => Sep 2014 - Feb 2015
+  # vscal 09/2014-02/2015  => Sep 2014 - Feb 2015
   def test_month_range_with_years_slash_dash
     month_range = ParamParser.new.parse_command_line_parameters(["09/2014-02/2015"])
 

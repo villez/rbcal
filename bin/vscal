@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+require "vscal"
+
+month_range = ParamParser.new.parse_command_line_parameters(ARGV)
+VsCal.new(month_range[:start], month_range[:end]).print_calendar

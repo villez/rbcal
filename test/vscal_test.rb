@@ -1,5 +1,5 @@
 require "minitest/autorun"
-require "./vscal"
+require "vscal"
 
 # These tests compare the printed output of the VsCal#print_calendar method
 # to known good outputs stored in text files. The months are provided
@@ -15,9 +15,9 @@ class VsCalTest < Minitest::Test
     end
   end
 
- def test_full_year
-   expected = File.read("test/expected_output/full_year_2007.txt")
-   assert_output(expected) do
+  def test_full_year
+    expected = File.read("test/expected_output/full_year_2007.txt")
+    assert_output(expected) do
       VsCal.new(Date.new(2007, 01), Date.new(2007, 12), false).print_calendar
     end
   end
