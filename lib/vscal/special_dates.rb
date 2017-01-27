@@ -19,7 +19,7 @@ module VsCal
                       [25, 12],
                       [26, 12]]
 
-    def initialize(year, read_config=true)
+    def initialize(year, read_config = true)
       @year = year
       @holidays = holidays
       @personal_hilights = common_finnish_hilight_days

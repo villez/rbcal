@@ -11,7 +11,7 @@ module VsCal
     EMPTY_DAY = "   "
     MONTH_GUTTER = "  "
 
-    def initialize(start_month, end_month, read_config=true)
+    def initialize(start_month, end_month, read_config = true)
       @month_range = []
       @special_dates = {}
       @read_config = read_config
