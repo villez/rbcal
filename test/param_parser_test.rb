@@ -1,4 +1,4 @@
-require "minitest/autorun"
+require "test_helper"
 require "vscal/param_parser"
 
 # These tests verify that the command-line parser identifies the parameter combinations

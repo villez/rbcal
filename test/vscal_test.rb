@@ -1,4 +1,4 @@
-require "minitest/autorun"
+require "test_helper"
 require "vscal"
 
 # These tests compare the printed output of the VsCal#print_calendar method
