@@ -27,7 +27,7 @@ module VsCal
 
     # interpreting the command-line parameters to determine the month(s)
     # and year(s) for the calendar range
-    def parse_command_line_parameters(arguments)
+    def self.parse_command_line_parameters(arguments)
 
       # This is actually redundant, as any non-numeric params
       # will fail the later checks for valid month/date parameters,
@@ -84,7 +84,7 @@ module VsCal
       { start: start_month, end: end_month }
     end
 
-    def legal_month_range?(start_month, end_month)
+    def self.legal_month_range?(start_month, end_month)
       (1..12).include?(start_month.month) &&
         (1..12).include?(end_month.month) &&
         start_month.year <= end_month.year &&
