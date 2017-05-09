@@ -11,10 +11,12 @@ module VsCal
     EMPTY_DAY = "   "
     MONTH_GUTTER = "  "
 
-    def initialize(start_month, end_month, read_config = true)
+    attr_reader :special_dates, :month_range, :read_config_flag
+
+    def initialize(start_month, end_month, read_config_flag = true)
       @month_range = []
       @special_dates = {}
-      @read_config = read_config
+      @read_config_flag = read_config_flag
       initialize_parameters(start_month, end_month)
     end
 
@@ -22,16 +24,16 @@ module VsCal
     # the start & end months for the calendar display. The complexity
     # comes from handling month ranges spanning multiple years.
     def initialize_parameters(start_month, end_month)
-      @special_dates[start_month.year] = VsCal::SpecialDates.new(start_month.year, @read_config)
+      special_dates[start_month.year] = VsCal::SpecialDates.new(start_month.year, read_config_flag)
 
       m = start_month.month
       y = start_month.year
       while y < end_month.year || (y == end_month.year && m <= end_month.month)
-        @month_range << Date.new(y, m)
+        month_range << Date.new(y, m)
         if m == 12
           m = 1
           y += 1
-          @special_dates[y] = VsCal::SpecialDates.new(y, @read_config)
+          special_dates[y] = VsCal::SpecialDates.new(y, read_config_flag)
         else
           m += 1
         end
@@ -39,7 +41,7 @@ module VsCal
     end
 
     def print_calendar
-      @month_range.each_slice(COLUMNS) do |month_slice|
+      month_range.each_slice(COLUMNS) do |month_slice|
         print_months_side_by_side(month_slice)
       end
     end
@@ -134,9 +136,9 @@ module VsCal
       formatted_day = format("%02d ", date.day)
       if date == Date.today
         formatted_day = format_today(formatted_day)
-      elsif @special_dates[date.year].holiday?(date)
+      elsif special_dates[date.year].holiday?(date)
         formatted_day = format_holiday(formatted_day)
-      elsif @special_dates[date.year].personal_hilight?(date)
+      elsif special_dates[date.year].personal_hilight?(date)
         formatted_day = format_hilight(formatted_day)
       end
       formatted_day
